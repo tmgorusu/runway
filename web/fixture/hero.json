@@ -1,0 +1,21 @@
+{
+  "fixture": true,
+  "note": "Placeholder in Wear's hero.json schema. The dashboard labels it FIXTURE until outputs/track1/hero.json exists. Not a result.",
+  "synthetic": true,
+  "fleet_n": 4000,
+  "seed": 7,
+  "policy_for_ratio": "even",
+  "rule_hash": "",
+  "soc_each_call": 1.0,
+  "assumption_sets": {
+    "nominal": {
+      "wear_per_kwh_miss": 0.0,
+      "wear_per_kwh_hit": 0.0,
+      "ratio": 1.0,
+      "wear_fraction_on_misses": 0.0,
+      "kwh_miss": 0.0,
+      "kwh_hit": 0.0
+    }
+  },
+  "total_capacity_fraction_lost": {"runway": 0.0, "even": 0.0, "most_charge": 0.0}
+}

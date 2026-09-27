@@ -65,6 +65,15 @@ def decision_rows(r: dict) -> list[dict]:
     return rows
 
 
+def unit_rows(r: dict) -> list[list]:
+    """Per unit: id, sun_exposure, health, cost scalar at the post-fault setpoint."""
+    call: Call = r["call"]
+    dt_s = call.duration_min * 60.0
+    after = {s.unit_id: s.power_kw for s in r["setpoints_after"]}
+    return [[u.unit_id, round(u.sun_exposure, 4), round(u.health, 4),
+             round(_cost(u, call, after[u.unit_id], dt_s), 6)] for u in r["view_after"]]
+
+
 def run(seed: int = 7, fault: str = "offline_wave", n: int | None = None) -> dict:
     n = n or dispatcher.filmed_n()
     r = dispatcher.run_chaos(seed=seed, fault=fault, n=n)
@@ -91,7 +100,11 @@ def run(seed: int = 7, fault: str = "offline_wave", n: int | None = None) -> dic
         "setpoints_after": [[s.unit_id, s.power_kw] for s in r["setpoints_after"]],
         "delivered_kw": r["delivered_kw"],
         "solve_ms": r["solve_ms"],
+        "units": unit_rows(r),
     }) + "\n")
+    from runway import web
+
+    web.build()
     return {"metrics": m, "rows": rows, "raw": r}
 
 

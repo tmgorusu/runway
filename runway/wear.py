@@ -34,7 +34,9 @@ def run() -> dict:
     ov = overlay.build()
     s = replay.run([c for c, _ in read_calls()], daily=daily_mean_austin())
     physics_lines.write()
-    from runway import austin
+    from runway import austin, value
+    value.build()
+    austin.bench_game()
     aus = austin.build()
     write_json(STAMP, _inputs())
     return {"hero": h, "overlay": ov, "summary": s, "telemetry_fit": fit, "austin_events": len(aus["events"])}
@@ -48,7 +50,7 @@ def ensure() -> bool:
     fresh = STAMP.exists() and read_json(STAMP) == _inputs() and all(
         (OUTPUTS / p).exists() for p in ("track1/hero.json", "replay/summary.json", "physics/blast_overlay.json",
                                          "telemetry/fleet_estimates.parquet", "physics/telemetry_fit.json",
-                                         "austin/events.json"))
+                                         "austin/events.json", "track1/value.json", "bench/game.json"))
     if not fresh:
         run()
     else:

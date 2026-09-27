@@ -7,7 +7,7 @@
   "tracking_error_kw": 0.0,
   "shortfall_kw": 0.0,
   "reserve_violations": 0,
-  "resole_latency_ms": 89.404,
+  "resole_latency_ms": 90.111,
   "seq_before": 1,
   "seq_after": 2,
   "cost": "marginal_wear"

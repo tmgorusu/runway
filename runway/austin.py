@@ -389,17 +389,23 @@ def default_activation_cost(zones, R) -> float:
 
 # ---- unit-level realization -------------------------------------------------
 
+def unit_dispatch(zone_of, zones, ctx, result: dict) -> np.ndarray:
+    """Each targeted zone water-fills its own units to the zone's equilibrium dispatch."""
+    power = np.zeros(len(zone_of))
+    zid = {z["id"]: k for k, z in enumerate(zones)}
+    for zone_id, kw in zip(result["members"], result["dispatch_kw"]):
+        idx = np.where(zone_of == zid[zone_id])[0]
+        p, _ = water_fill(kw, ctx["caps"][idx], ctx["grid"][idx], ctx["costs"][idx])
+        power[idx] = p
+    return power
+
+
 def realize(units, zone_of, zones, curves, ctx, call: Call, result: dict) -> dict:
     """Dispatch units inside each targeted zone by water-fill; compare with even spread and the unconstrained water-fill."""
     arr, caps, grid, costs, w = ctx["arr"], ctx["caps"], ctx["grid"], ctx["costs"], ctx["w"]
     dt = call.duration_min * 60.0
     R = call.kw_requested
-    power = np.zeros(len(units))
-    zid = {z["id"]: k for k, z in enumerate(zones)}
-    for zone_id, kw in zip(result["members"], result["dispatch_kw"]):
-        idx = np.where(zone_of == zid[zone_id])[0]
-        p, _ = water_fill(kw, caps[idx], grid[idx], costs[idx])
-        power[idx] = p
+    power = unit_dispatch(zone_of, zones, ctx, result)
     even_p = np.minimum(caps, R / len(units))
     free_p, free_short = water_fill(R, caps, grid, costs)
     host = np.array([c["host_kw"] for c in curves])
@@ -465,8 +471,104 @@ def build() -> dict:
     return out
 
 
+# ---- dispatch plan export (usable with a real fleet that follows the telemetry schema) ----
+
+def _event_context(day: str, mw: float | None = None):
+    reg = pd.read_parquet(telemetry.REGISTRY)
+    daily = pd.read_parquet(telemetry.DAILY)
+    daily["day"] = pd.to_datetime(daily["day"])
+    zone_of, zones = build_zones(reg)
+    ev = next((e for e in detect_anomalies() if e["day"] == day), None)
+    if ev is None:
+        raise SystemExit(f"{day} is not an anomaly day in the April–September 2025 window")
+    mw = ev["mw"] if mw is None else mw
+    call = Call(f"aen-{day}", pd.Timestamp(ev["start_utc"]).to_pydatetime(), DURATION_MIN, mw, "Austin Energy",
+                max(ev["severity"], 0.9 if "4cp_candidate" in ev["types"] else ev["severity"]), ev["ambient_c"])
+    units, stale = event_units(make_fleet(len(reg)), daily, ev)
+    curves, ctx = zone_curves(units, zone_of, zones, call)
+    return reg, zone_of, zones, units, stale, curves, ctx, call
+
+
+def plan(day: str, mw: float | None = None, activation: float = 1.0, hosting: float = 1.0, out_zones=(), path=None) -> dict:
+    """Solve one anomaly day and write per-unit setpoints to CSV."""
+    reg, zone_of, zones, units, stale, curves, ctx, call = _event_context(day, mw)
+    F = default_activation_cost(curves, call.kw_requested) * activation
+    res = solve(curves, call.kw_requested, F, hosting, out_zones)
+    power = unit_dispatch(zone_of, zones, ctx, res)
+    mw_cost = marginal_grid(ctx["arr"], call, power[:, None], call.duration_min * 60.0)[:, 0]
+    stale_set = set(stale)
+    rows = pd.DataFrame({
+        "unit_id": reg["unit_id"], "zone": [zones[z]["id"] for z in zone_of], "lat": reg["lat"], "lon": reg["lon"],
+        "power_kw": np.round(power, 4), "feasible_kw": np.round(ctx["caps"], 4),
+        "marginal_wear_at_setpoint": np.where(power > 0, mw_cost, np.nan), "stale_telemetry": [u in stale_set for u in reg["unit_id"]],
+    })
+    path = path or (OUTPUTS / "austin" / f"plan_{day}.csv")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows.to_csv(path, index=False)
+    return {"path": path, "result": res, "delivered_kw": float(power.sum()), "units_dispatched": int((power > 0).sum()),
+            "requested_kw": call.kw_requested}
+
+
+# ---- scale benchmark ----------------------------------------------------------
+
+def bench_game(sizes=(4000, 10000, 100000), day: str = "2025-07-30", path=None) -> dict:
+    """Time the zone supply curves, the game (with Shapley), and the unit-level dispatch at several fleet sizes."""
+    import platform
+    import time
+    reg = pd.read_parquet(telemetry.REGISTRY)
+    _, zones = build_zones(reg)
+    ev = next(e for e in detect_anomalies() if e["day"] == day)
+    rows = []
+    for n in sizes:
+        fleet = make_fleet(n)
+        units = [dataclasses.replace(u, soc=1.0, last_seen=None, metadata=dict(u.metadata)) for u in fleet]
+        zone_of = np.arange(n) % len(zones)
+        call = Call("bench", pd.Timestamp(ev["start_utc"]).to_pydatetime(), DURATION_MIN, ev["mw"] * n / 4000.0,
+                    "Austin Energy", 0.98, ev["ambient_c"])
+        t0 = time.perf_counter()
+        curves, ctx = zone_curves(units, zone_of, zones, call)
+        t1 = time.perf_counter()
+        res = solve(curves, call.kw_requested, default_activation_cost(curves, call.kw_requested))
+        t2 = time.perf_counter()
+        power = unit_dispatch(zone_of, zones, ctx, res)
+        t3 = time.perf_counter()
+        rows.append({"n_units": n, "mw_requested": call.mw_requested, "curves_ms": 1000 * (t1 - t0), "game_ms": 1000 * (t2 - t1),
+                     "unit_dispatch_ms": 1000 * (t3 - t2), "total_ms": 1000 * (t3 - t0), "zones_targeted": len(res["members"]),
+                     "delivered_kw": float(power.sum())})
+    out = {"synthetic_fleet": True, "event_day": day, "zones": len(zones), "shapley_permutations": SHAPLEY_M,
+           "cpu": platform.processor() or platform.machine(), "python": platform.python_version(),
+           "note": "Fleets above 4,000 use the assumed-distribution fallback and round-robin zone assignment; timing only.",
+           "results": rows}
+    try:
+        from runway.bench import cpu_model
+        out["cpu"] = cpu_model()
+    except Exception:
+        pass
+    path = path or (OUTPUTS / "bench" / "game.json")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(out, indent=2) + "\n")
+    return out
+
+
 def main(argv=None) -> int:
-    argparse.ArgumentParser(description=__doc__.splitlines()[0]).parse_args(argv)
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--plan", metavar="DAY", help="write per-unit setpoints for one anomaly day (YYYY-MM-DD) and exit")
+    ap.add_argument("--mw", type=float, help="requested MW (default: the anomaly type's default)")
+    ap.add_argument("--activation", type=float, default=1.0, help="zone activation cost, multiple of the default")
+    ap.add_argument("--hosting", type=float, default=1.0, help="feeder hosting limits, multiple of the synthetic limits")
+    ap.add_argument("--out-zone", action="append", default=[], help="zone id to treat as out (repeatable)")
+    ap.add_argument("--bench", action="store_true", help="time the game at 4,000 / 10,000 / 100,000 units and exit")
+    a = ap.parse_args(argv)
+    if a.plan:
+        r = plan(a.plan, a.mw, a.activation, a.hosting, a.out_zone)
+        print(f"{a.plan}: {len(r['result']['members'])} zones, {r['units_dispatched']:,} batteries, "
+              f"{r['delivered_kw'] / 1000:.3f} of {r['requested_kw'] / 1000:.3f} MW -> {r['path'].relative_to(ROOT)} (synthetic fleet)")
+        return 0
+    if a.bench:
+        for row in bench_game()["results"]:
+            print(f"{row['n_units']:>7,} units  curves {row['curves_ms']:7.0f} ms  game {row['game_ms']:6.0f} ms  "
+                  f"unit dispatch {row['unit_dispatch_ms']:6.0f} ms  total {row['total_ms']:7.0f} ms")
+        return 0
     out = build()
     ev = out["events"]
     print(f"{len(ev)} anomaly days (synthetic fleet, real Austin Energy prices and weather); {len(out['zones'])} synthetic feeder zones")

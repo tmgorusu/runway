@@ -33,6 +33,9 @@ SOURCES = {
     "telemetry_fit": OUT / "physics" / "telemetry_fit.json",
     "hit_flags": ROOT / "handoff" / "hit_flags.json",
     "austin": OUT / "austin" / "events.json",
+    "value": OUT / "track1" / "value.json",
+    "game_bench": OUT / "bench" / "game.json",
+    "basemap": ROOT / "data" / "basemap" / "austin.json",
 }
 HERO = OUT / "track1" / "hero.json"
 

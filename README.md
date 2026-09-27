@@ -120,6 +120,7 @@ synthetic telemetry ──► telemetry_fit ──► seed-7 fleet (age, exposur
 - Published 2025 4CP intervals: ERCOT report NP9-83-M, Four Coincident Peak Calculations.
 - Day-ahead settlement point prices (cached only; never used by the allocator): ERCOT NP4-180-ER via gridstatus.
 - Hourly temperature: [Open-Meteo](https://open-meteo.com/) historical weather API (ERA5), CC BY 4.0.
+- Basemap: U.S. Census Bureau TIGER/Line 2024 roads, area water, and places (public domain), baked into `data/basemap/austin.json` by `python -m runway.basemap --fetch`.
 - Aging reference: NREL [BLAST-Lite](https://github.com/NREL/BLAST-Lite) 1.1.1 (Apache-2.0), run once to produce `physics/blast_lite_reference.csv`. Runway does not import or redistribute BLAST-Lite code.
 - Cycle-aging activation energy: J. Wang et al., "Cycle-life model for graphite-LiFePO4 cells," *J. Power Sources* 196 (2011) 3942–3948.
 

@@ -142,6 +142,7 @@ tr.best td:first-child{font-weight:600}
       <div><span>Shortfall</span><b id="k-short">—</b></div>
     </div>
     <div class="tabs">
+      <button class="tab" data-pop="p-value">Value</button>
       <button class="tab" data-pop="p-ctrl">Controls</button>
       <button class="tab" data-pop="p-compare">Compare</button>
       <button class="tab" data-pop="p-shap">Shapley</button>
@@ -160,6 +161,9 @@ tr.best td:first-child{font-weight:600}
     <div class="ctrl"><label>Zone activation cost <b id="f-v"></b></label><input id="f" type="range" min="0" max="3" step="0.05"></div>
     <div class="ctrl"><label>Feeder hosting limits <b id="h-v"></b></label><input id="h" type="range" min="0.5" max="1.5" step="0.05"></div>
     <button class="reset" id="reset">Reset to defaults</button>
+    <button class="reset" id="export" style="background:var(--dark);color:#fff;border-color:var(--dark)">Download dispatch plan (CSV)</button>
+    <div class="note">Zone-level plan for the settings above. For unit-by-unit setpoints, run:</div>
+    <code id="plan-cmd" style="display:block;background:var(--surface);border-radius:8px;padding:8px;margin-top:4px;font-size:11px;word-break:break-all"></code>
   </div>
 
   <div class="float pop" id="p-compare">
@@ -182,6 +186,16 @@ tr.best td:first-child{font-weight:600}
   </div>
 
 
+
+  <div class="float pop wide" id="p-value">
+    <h3>What the 2025 hunt was worth, and what it cost <button data-close>×</button></h3>
+    <p>Dollars use the brief's rough ERCOT-wide figure (about $17/kW per 4CP interval) on the 40 MW Austin contract. The cost is battery life: capacity lost across the synthetic 4,000-unit fleet, in battery-equivalents.</p>
+    <div class="hfacts" id="value-facts"></div>
+    <table id="value-table" style="margin-top:8px"></table>
+    <div class="ctrl" style="margin-top:12px"><label>Your cost per battery-equivalent of capacity (optional) <b id="bat-v">not set</b></label>
+      <input id="bat" type="number" min="0" step="1000" placeholder="e.g. your replacement cost in $" style="width:100%;font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="note" id="value-note"></div>
+  </div>
   <div class="float pop wide" id="p-live">
     <h3>Live dispatch: seed-7 offline wave <button data-close>×</button></h3>
     <p>{{n_units}} synthetic units, cost {{cost}}. The units holding the largest setpoints go offline mid-call; the dispatcher detects the missed heartbeats and re-solves on the survivors. Call progress uses simulated time; re-solve latency uses the wall clock.</p>
@@ -218,6 +232,8 @@ tr.best td:first-child{font-weight:600}
       <div id="replay"></div>
       <h4 style="margin-top:12px">Allocator benchmark</h4>
       <div id="bench"></div>
+      <h4 style="margin-top:12px">Subgrid game at scale</h4>
+      <div id="game-bench"></div>
     </section>
   </div>
 
@@ -249,7 +265,7 @@ tr.best td:first-child{font-weight:600}
     <div><i class="sw" style="background:var(--ink);border-radius:50%"></i>stale telemetry</div>
   </div>
 
-  <div id="foot"><b>Synthetic fleet, synthetic feeder zones.</b> LZ_AEN prices, ERCOT load and 4CP intervals, and Austin weather (Open-Meteo, CC BY 4.0) are real 2025 data. Not Austin Energy's feeder map, not Base Power telemetry.</div>
+  <div id="foot"><b>Synthetic fleet, synthetic feeder zones.</b> LZ_AEN prices, ERCOT load and 4CP intervals, and Austin weather (Open-Meteo, CC BY 4.0) are real 2025 data. Not Austin Energy's feeder map, not Base Power telemetry. Basemap: U.S. Census Bureau TIGER/Line 2024.</div>
 
   <div class="float" id="timeline">
     <div class="t"><span id="tl-title">2025 anomalies · click a bar or use ← →</span><span><i class="sw" style="background:var(--dark);display:inline-block"></i> 4CP call &nbsp; <i class="sw" style="background:var(--energy);display:inline-block"></i> price spike &nbsp; <i class="sw" style="background:var(--gold);display:inline-block"></i> heat &nbsp; ● caught a 4CP interval</span></div>
@@ -303,11 +319,27 @@ function drawMap(){
   res.members.forEach((id,j)=>kw.set(id,res.dispatch_kw[j]));
   const shap=new Map(); const tot=res.shapley.reduce((a,b)=>a+b,0)||1; res.members.forEach((id,j)=>shap.set(id,res.shapley[j]/tot));
   zoneRects=A.zones.map((z,k)=>{ const [a,b]=proj(z.cell[1],z.cell[2]), [c2,d]=proj(z.cell[0],z.cell[3]); return {z,k,x:a,y:b,w:c2-a,h:d-b}; });
+  const B=D.basemap;
+  if(B){
+    g.save(); g.lineJoin='round'; g.lineCap='round';
+    const ring=(pts)=>{ pts.forEach(([lo,la],i)=>{ const [x,y]=proj(la,lo); i?g.lineTo(x,y):g.moveTo(x,y); }); g.closePath(); };
+    g.beginPath(); B.city.forEach(ring); g.fillStyle='#e8e5df'; g.fill('evenodd'); g.strokeStyle='#cfcbc3'; g.lineWidth=1; g.stroke();
+    g.beginPath(); B.water.forEach(ring); g.fillStyle='#bcd8e8'; g.fill();
+    for(const cls of [2,1]){ for(const casing of [true,false]){
+      g.beginPath();
+      for(const r of B.roads){ if(r.c!==cls) continue; r.p.forEach(([lo,la],i)=>{ const [x,y]=proj(la,lo); i?g.lineTo(x,y):g.moveTo(x,y); }); }
+      g.strokeStyle = casing ? '#c9c5bd' : '#ffffff'; g.lineWidth = cls===1 ? (casing?4.5:2.8) : (casing?2.2:1.2); g.stroke(); } }
+    g.font='600 10px sans-serif';
+    for(const L of B.labels){ const [x,y]=proj(L.lat,L.lon); const tw=g.measureText(L.name).width+8;
+      g.fillStyle='#ffffff'; roundRect(g,x-tw/2,y-7,tw,14,7); g.fill(); g.strokeStyle='#c9c5bd'; g.stroke(); g.fillStyle='#54524f'; g.fillText(L.name,x-tw/2+4,y+4); }
+    g.restore();
+  }
   for(const r of zoneRects){
     const out=state.out.has(r.z.id), t=kw.has(r.z.id)?kw.get(r.z.id)/maxKw:null, hov=state.hover===r.k;
     roundRect(g,r.x+2,r.y+2,r.w-4,r.h-4,10);
-    g.fillStyle = out ? '#e8a59f' : (t!==null ? mix(css('--lime-soft'), css('--dark'), Math.min(1,t)) : '#e4e2de');
-    g.fill();
+    g.globalAlpha = out ? 0.75 : (t!==null ? 0.35 + 0.4*Math.min(1,t) : 0.12);
+    g.fillStyle = out ? '#e8a59f' : (t!==null ? mix(css('--lime-soft'), css('--dark'), Math.min(1,t)) : '#bdb9b1');
+    g.fill(); g.globalAlpha = 1;
     g.lineWidth = hov ? 3 : (t!==null ? 2 : 1); g.strokeStyle = hov ? css('--ink') : (t!==null ? css('--lime') : '#d3d1cc'); g.stroke();
   }
   const stale=new Set(e.stale_units);
@@ -412,7 +444,7 @@ function drawShapley(res){
 
 // ---- live dispatch, season, physics (pipeline JSON) ----
 function pending(msg){ return `<div class="pending">${msg}</div>`; }
-function drawPopup(id){ if(id==='p-live'){ drawThermal(); drawWaterfill(); } if(id==='p-season') drawSeason(); if(id==='p-physics') drawPhysics(); }
+function drawPopup(id){ if(id==='p-live'){ drawThermal(); drawWaterfill(); } if(id==='p-season'){ drawSeason(); drawGameBench(); } if(id==='p-physics') drawPhysics(); if(id==='p-value') drawValue(); if(id==='p-ctrl') planCmd(); }
 function drawThermal(){
   const c=$('fleet'), run=D.run; if(!run){ c.outerHTML=pending('outputs/demo/run.json not written yet: run the demo'); return; }
   const dpr=window.devicePixelRatio||1, W=c.clientWidth, H=200; c.width=W*dpr; c.height=H*dpr; const g=c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
@@ -466,6 +498,44 @@ function drawPhysics(){
   $('physics-notes').innerHTML=notes.join('<br>');
 }
 
+function drawValue(){
+  const V=D.value; if(!V){ $('value-facts').innerHTML=pending('outputs/track1/value.json not written yet'); return; }
+  const c=V.committed, usd=x=>`$${(x/1e6).toFixed(2)}M`;
+  $('value-facts').innerHTML=[
+    [usd(V.value_at_stake_usd), `at stake each year if all 4 intervals are caught (40 MW × $${V.usd_per_kw_interval}/kW × 4)`],
+    [`${c.intervals_caught} of 4`, `caught by the committed 0.97 rule, with ${c.calls} calls`],
+    [`${fmt(c.wear_battery_eq,2)}`, `battery-equivalents of capacity spent on those calls`],
+    [`${fmt(100*c.wear_share_on_misses,1)}%`, `of that spent on calls that missed every 4CP interval`],
+  ].map(([b,t])=>`<div class="hfact"><b>${b}</b><span>${t}</span></div>`).join('');
+  const bat=parseFloat($('bat').value), hasBat=isFinite(bat)&&bat>0;
+  $('bat-v').textContent = hasBat ? `$${bat.toLocaleString()}` : 'not set';
+  $('value-table').innerHTML=`<tr><th>threshold</th><th>calls</th><th>4CP caught</th><th>value caught</th><th>battery-eq spent</th><th>per interval</th>${hasBat?'<th>wear $</th>':''}</tr>`+
+    V.thresholds.map(r=>`<tr class="${r.committed?'best':''}"><td>${r.threshold.toFixed(2)}${r.committed?' (committed)':''}</td><td>${r.calls}</td><td>${r.intervals_caught} of 4</td><td>${usd(r.value_caught_usd)}</td><td>${fmt(r.wear_battery_eq,2)}</td><td>${fmt(r.wear_per_interval_caught,2)}</td>${hasBat?`<td>$${Math.round(r.wear_battery_eq*bat).toLocaleString()}</td>`:''}</tr>`).join('');
+  const best=V.thresholds.filter(r=>r.intervals_caught===c.intervals_caught).reduce((a,b)=>a.wear_battery_eq<=b.wear_battery_eq?a:b);
+  $('value-note').textContent = best.threshold!==c.threshold ?
+    `In 2025, ${best.threshold.toFixed(2)} would have caught the same ${best.intervals_caught} intervals with ${c.calls-best.calls} fewer calls and ${fmt(100*(1-best.wear_battery_eq/c.wear_battery_eq),0)}% less battery life spent. That is hindsight on one year; the committed rule stays 0.97, and 0.96 / 0.98 are the sensitivity pair the calling rule allows.` :
+    'The committed rule already spends the least battery life among thresholds that catch the same intervals.';
+}
+$('bat').oninput=drawValue;
+function planCsv(){
+  const e=events[state.i], res=state.res, tot=res.shapley.reduce((a,b)=>a+b,0)||1;
+  const rows=[['zone','status','dispatch_mw','hosting_limit_mw','batteries','shapley_share']];
+  e.zones.forEach((z,k)=>{ const j=res.members.indexOf(z.id), meta=A.zones[k];
+    rows.push([z.id, state.out.has(z.id)?'out':(j>=0?'targeted':'not_called'), j>=0?(res.dispatch_kw[j]/1000).toFixed(4):'0', (z.host_kw*state.h/1000).toFixed(4), meta.n_units, j>=0?(res.shapley[j]/tot).toFixed(4):'']); });
+  const head=`# Runway dispatch plan (synthetic fleet) ${e.day} ${new Date(e.start_utc).toISOString()} requested_mw=${state.mw} activation=${state.f} hosting=${state.h} clearing_price=${res.lam}\n`;
+  return head+rows.map(r=>r.join(',')).join('\n')+'\n';
+}
+$('export').onclick=()=>{ const e=events[state.i], blob=new Blob([planCsv()],{type:'text/csv'}), a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=`runway_plan_${e.day}_${state.mw}MW.csv`; document.body.appendChild(a); a.click(); a.remove(); };
+function planCmd(){ const e=events[state.i];
+  $('plan-cmd').textContent=`python -m runway.austin --plan ${e.day} --mw ${state.mw} --activation ${fmt(state.f,2)} --hosting ${fmt(state.h,2)}`+[...state.out].map(z=>` --out-zone ${z}`).join(''); }
+function drawGameBench(){
+  const B=D.game_bench; if(!B){ $('game-bench').innerHTML=pending('outputs/bench/game.json not written yet'); return; }
+  $('game-bench').innerHTML=`<table><tr><th>units</th><th>zone curves</th><th>game + Shapley</th><th>unit dispatch</th><th>total</th></tr>`+
+    B.results.map(r=>`<tr><td>${r.n_units.toLocaleString()}</td><td>${r.curves_ms.toFixed(0)} ms</td><td>${r.game_ms.toFixed(0)} ms</td><td>${r.unit_dispatch_ms.toFixed(0)} ms</td><td>${r.total_ms.toFixed(0)} ms</td></tr>`).join('')+
+    `</table><div class="note">The game runs on ${B.zones} zone supply curves, so its time is flat in fleet size. ${B.cpu}.</div>`;
+}
+
 function update(){
   const e=events[state.i], zones=e.zones, R=state.mw*1000, F=e.activation_cost*state.f;
   $('mw-v').textContent=`${state.mw} MW`; $('f-v').textContent=`${fmt(state.f,2)}× default`; $('h-v').textContent=`${fmt(state.h,2)}×`;
@@ -489,7 +559,7 @@ function update(){
   const u=e.units, isDefault=state.mw===e.mw&&state.f===1&&state.h===1&&state.out.size===0;
   $('compare-note').textContent=isDefault?`Unit-level check at these defaults (Python): ${u.game.units_dispatched.toLocaleString()} batteries dispatched, ${u.game.reserve_violations} reserve and ${u.game.feeder_violations} feeder violations; true wear ${fmt(u.game.true_wear,4)} vs even ${fmt(u.even.true_wear,4)} (${u.even.feeder_violations} feeders overloaded) vs unconstrained ${fmt(u.unconstrained.true_wear,4)} (${u.unconstrained.feeder_violations}). Staying inside feeder limits costs some wear.`:
     'Re-solved in your browser on the zone supply curves. Reset to defaults to see the unit-level Python check.';
-  drawMap(); drawShapley(res); drawTimeline();
+  drawMap(); drawShapley(res); drawTimeline(); planCmd();
 }
 function pick(i){ state.i=(i+events.length)%events.length; state.out.clear(); state.mw=events[state.i].mw; state.f=1; state.h=1;
   $('mw').value=state.mw; $('f').value=1; $('h').value=1; drawEvent(); update(); }

@@ -1,0 +1,61 @@
+{
+  "synthetic_fleet": true,
+  "sources": {
+    "usd_per_kw_interval": "hackathon brief, rough ERCOT-wide figure",
+    "calls": "handoff/calls.parquet under CALLING_RULE.md; 0.96 and 0.98 are the allowed sensitivity pair",
+    "wear": "call-attributable capacity lost, even spread, nominal assumptions, 4,000 synthetic units"
+  },
+  "usd_per_kw_interval": 17.0,
+  "contract_mw": 40.0,
+  "value_at_stake_usd": 2720000.0,
+  "committed": {
+    "threshold": 0.97,
+    "committed": true,
+    "calls": 52,
+    "intervals_caught": 4,
+    "value_caught_usd": 2720000.0,
+    "discharge_mwh": 3120.0,
+    "wear_battery_eq": 3.213812089694173,
+    "wear_on_misses_battery_eq": 2.953627558364248,
+    "wear_share_on_misses": 0.9190417721794419,
+    "wear_per_interval_caught": 0.8034530224235432
+  },
+  "thresholds": [
+    {
+      "threshold": 0.96,
+      "committed": false,
+      "calls": 63,
+      "intervals_caught": 4,
+      "value_caught_usd": 2720000.0,
+      "discharge_mwh": 3780.0,
+      "wear_battery_eq": 3.8852959350184246,
+      "wear_on_misses_battery_eq": 3.6251114036885,
+      "wear_share_on_misses": 0.9330335357508125,
+      "wear_per_interval_caught": 0.9713239837546062
+    },
+    {
+      "threshold": 0.97,
+      "committed": true,
+      "calls": 52,
+      "intervals_caught": 4,
+      "value_caught_usd": 2720000.0,
+      "discharge_mwh": 3120.0,
+      "wear_battery_eq": 3.213812089694173,
+      "wear_on_misses_battery_eq": 2.953627558364248,
+      "wear_share_on_misses": 0.9190417721794419,
+      "wear_per_interval_caught": 0.8034530224235432
+    },
+    {
+      "threshold": 0.98,
+      "committed": false,
+      "calls": 38,
+      "intervals_caught": 4,
+      "value_caught_usd": 2720000.0,
+      "discharge_mwh": 2280.0,
+      "wear_battery_eq": 2.359822832525823,
+      "wear_on_misses_battery_eq": 2.0996383011958977,
+      "wear_share_on_misses": 0.8897440402119349,
+      "wear_per_interval_caught": 0.5899557081314557
+    }
+  ]
+}

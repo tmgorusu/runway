@@ -12,7 +12,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # Only needed to refresh the cache from the network. The demo never imports these.
-ingest = ["gridstatus>=0.29", "requests>=2.31"]
+ingest = ["gridstatus>=0.29", "pytz", "requests>=2.31", "openpyxl>=3.1"]
 
 [dependency-groups]
 dev = ["pytest>=8"]

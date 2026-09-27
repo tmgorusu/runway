@@ -1,0 +1,46 @@
+{
+  "year": 2025,
+  "fetched_at": "2026-09-27T03:24:05+00:00",
+  "files": {
+    "parquet/ercot_load": {
+      "path": "data/parquet/ercot_load.parquet",
+      "rows": 8711,
+      "sha256": "66adf59f97f50870e7e3e8a8d547bbed95d5e9b918ebdba2251e2965a573b19b"
+    },
+    "fixture/ercot_load": {
+      "path": "data/fixture/ercot_load.parquet",
+      "rows": 720,
+      "sha256": "f3a2c09fdeb398e82c2ca80608f608a1e66cbad86e1674bb5daf36f7b9a9a443"
+    },
+    "parquet/published_4cp": {
+      "path": "data/parquet/published_4cp.parquet",
+      "rows": 4,
+      "sha256": "e767f8695312e9e13a0bcf79506c6f9247f960999bfb67964b7a26d73a79c6ee"
+    },
+    "fixture/published_4cp": {
+      "path": "data/fixture/published_4cp.parquet",
+      "rows": 1,
+      "sha256": "ca8a3ffdb755f8e81b35fda841a6c66329175308396dc8ff127c6d6f88644382"
+    },
+    "parquet/weather": {
+      "path": "data/parquet/weather.parquet",
+      "rows": 26280,
+      "sha256": "4d54664c2e45ee69f3c0f2403b9bba9abd8b46f9d01ac2f96cfbbe97d39c8202"
+    },
+    "fixture/weather": {
+      "path": "data/fixture/weather.parquet",
+      "rows": 2160,
+      "sha256": "fa75c191f02e7f1600db91c2be5023f46ccec32f756a5c853b13a2dd2c9430ae"
+    },
+    "parquet/dam_spp": {
+      "path": "data/parquet/dam_spp.parquet",
+      "rows": 70080,
+      "sha256": "be0e132fa51b80eb7e3573c5abf81efdc6fdd698a4a2aa3293c890c6d8331e41"
+    },
+    "fixture/dam_spp": {
+      "path": "data/fixture/dam_spp.parquet",
+      "rows": 5760,
+      "sha256": "87c7b29a671ef0a49ecfc533b62009d8cbc4e026ccdf9b628b7981713f22cbcc"
+    }
+  }
+}

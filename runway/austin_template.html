@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runway · Austin anomaly response · synthetic fleet</title>
+<style>
+:root{
+  --surface:#f0eeeb;--raised:#fff;--dark:#1e4d2b;--darker:#102a17;--ink:#292826;--muted:#7f7d7a;--line:#d8d7d5;
+  --lime:#b2dd79;--lime-soft:#d6f0b4;--energy:#ed6c30;--energy-soft:#fbe3d8;--sky:#048ee5;--gridoff:#bf5249;--gold:#f9d77d;
+  --sans:"PP Neue Montreal","Helvetica Neue",Helvetica,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --display:"Clarendon Wide","PP Neue Montreal",Georgia,"Times New Roman",serif;
+  --shadow:0 8px 28px rgba(41,40,38,.14),0 1px 3px rgba(41,40,38,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--surface);color:var(--ink);font:14px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
+.nav{position:fixed;top:0;left:0;right:0;height:54px;display:flex;align-items:center;gap:18px;padding:0 20px;background:rgba(240,238,235,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:30}
+.mark{font-weight:600;font-size:17px;display:flex;align-items:center;gap:8px}
+.mark i{display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--dark);box-shadow:inset 0 -5px 0 var(--lime)}
+.nav a{white-space:nowrap;color:var(--muted);text-decoration:none}
+.nav a.on{color:var(--ink);font-weight:600;border-bottom:2px solid var(--dark);padding-bottom:2px}
+.pill{white-space:nowrap;border-radius:9999px;padding:4px 12px;font-size:12px;font-weight:600}
+.pill.synthetic{background:var(--dark);color:var(--lime);margin-left:auto}
+.pill.real{background:var(--raised);border:1px solid var(--line)}
+@media (max-width:820px){.pill.real{display:none}}
+#stage{position:fixed;top:54px;left:0;right:0;bottom:0}
+#map{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:pointer}
+.float{position:absolute;background:var(--raised);border-radius:16px;box-shadow:var(--shadow);z-index:10}
+#event{top:16px;left:16px;width:320px;padding:14px 16px}
+#event .row{display:flex;align-items:center;gap:8px}
+#event h2{font-family:var(--display);font-weight:400;font-size:21px;line-height:1.15;margin:6px 0 8px;flex:1}
+.nb{border:1px solid var(--line);background:var(--raised);border-radius:9999px;width:30px;height:30px;cursor:pointer;font-size:14px;line-height:1}
+.nb:hover{border-color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{border-radius:9999px;padding:2px 9px;font-size:11px;font-weight:600}
+.chip.cp{background:var(--dark);color:var(--lime)}.chip.price{background:var(--energy-soft);color:#742c0b}.chip.heat{background:#fdf1cc;color:#773d0d}.chip.hit{background:var(--lime-soft);color:var(--darker)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:12px}
+.facts span{display:block;color:var(--muted);font-size:11px}
+.facts b{font-weight:500;font-variant-numeric:tabular-nums}
+#result{top:16px;right:16px;width:300px;padding:14px 16px}
+#result .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#result .big{font-family:var(--display);font-size:30px;line-height:1.05;margin:4px 0 2px;color:var(--dark)}
+#result .sub{font-size:12px;color:var(--muted)}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-radius:10px;overflow:hidden;margin:10px 0}
+.kp div{background:var(--raised);padding:7px 8px}
+.kp span{display:block;font-size:10px;color:var(--muted)}
+.kp b{display:block;font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{font:inherit;font-size:12px;border:1px solid var(--line);background:var(--raised);border-radius:9999px;padding:5px 11px;cursor:pointer}
+.tab:hover{border-color:var(--ink)}
+.tab.on{background:var(--dark);color:#fff;border-color:var(--dark)}
+.pop{top:16px;right:332px;width:380px;max-height:calc(100% - 140px);overflow:auto;padding:16px 18px;display:none}
+.pop.show{display:block}
+.pop h3{margin:0 0 4px;font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.pop h3 button{border:none;background:none;font-size:18px;cursor:pointer;color:var(--muted)}
+.pop p{margin:0 0 10px;color:var(--muted);font-size:12px}
+
+.ctrl{margin:10px 0}
+.ctrl label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.ctrl label b{color:var(--ink);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:#1e4d2b}
+.reset{font:inherit;font-size:12px;border:1px solid var(--line);background:var(--raised);border-radius:9999px;padding:5px 12px;cursor:pointer}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:12px}
+td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:right}
+th{font-weight:500;color:var(--muted);font-size:11px}
+td:first-child,th:first-child{text-align:left}
+tr.best td{background:var(--lime-soft)}
+.bad{color:var(--gridoff);font-weight:600}
+.note{font-size:11px;color:var(--muted);margin-top:8px}
+.how ol{margin:0;padding-left:18px;font-size:12px}
+.how li{margin:6px 0}
+#timeline{left:16px;right:16px;bottom:16px;padding:8px 14px 6px;height:88px}
+#timeline .t{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+#tl{width:100%;height:58px;display:block;cursor:pointer}
+#legend{left:16px;bottom:118px;padding:10px 12px;font-size:11px;color:var(--muted);width:210px}
+#legend div{display:flex;align-items:center;gap:6px;margin:2px 0}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;flex:none}
+#tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;border-radius:10px;padding:8px 10px;font-size:12px;z-index:20;display:none;max-width:240px;box-shadow:var(--shadow)}
+#tip b{color:var(--lime)}
+#foot{position:absolute;right:16px;bottom:112px;z-index:9;font-size:10px;color:var(--muted);max-width:420px;text-align:right;background:rgba(240,238,235,.85);padding:4px 8px;border-radius:8px}
+body.compact #event{width:auto;max-width:calc(100% - 32px);padding:8px 10px 8px 14px}
+body.compact #event .facts,body.compact #event .chips{display:none}
+body.compact #event.open .facts{display:grid;margin-top:6px}
+body.compact #event.open .chips{display:flex}
+body.compact #event h2{font-size:16px;margin:0;cursor:pointer}
+body.compact #event h2::after{content:" ▾";font-size:11px;color:var(--muted)}
+body.compact #result{top:auto;bottom:82px;right:16px;width:auto;max-width:calc(100% - 32px);padding:10px 12px}
+body.compact #result .kp,body.compact #result .sub,body.compact #result .eyebrow{display:none}
+body.compact #result .big{font-size:18px;margin:0 0 8px}
+body.compact .tab{padding:4px 9px;font-size:11px}
+body.compact #timeline{height:62px;padding:4px 10px;bottom:12px;left:12px;right:12px}
+body.compact #tl{height:40px}
+body.compact #timeline .t span:last-child{display:none}
+body.compact #legend,body.compact #foot{display:none}
+body.compact .pop{left:16px;right:16px;width:auto;top:64px;bottom:auto;max-height:calc(100% - 170px)}
+</style>
+</head>
+<body>
+<header class="nav">
+  <span class="mark"><i></i>Runway</span>
+  <a href="index.html">Live dispatch</a>
+  <a class="on" href="austin.html">Austin anomalies</a>
+  <span class="pill synthetic">synthetic fleet</span>
+  <span class="pill real">Austin Energy prices &amp; weather: real</span>
+</header>
+
+<div id="stage">
+  <canvas id="map"></canvas>
+  <div id="tip"></div>
+
+  <div class="float" id="event">
+    <div class="chips" id="chips"></div>
+    <div class="row"><h2 id="ev-title">—</h2><button class="nb" id="prev" title="Previous anomaly (←)">‹</button><button class="nb" id="next" title="Next anomaly (→)">›</button></div>
+    <div class="facts" id="facts"></div>
+  </div>
+
+  <div class="float" id="result">
+    <div class="eyebrow">Targeted subgrid</div>
+    <div class="big" id="r-big">—</div>
+    <div class="sub" id="r-sub"></div>
+    <div class="kp">
+      <div><span>Clearing price λ*</span><b id="k-lam">—</b></div>
+      <div><span>Wear vs even</span><b id="k-even">—</b></div>
+      <div><span>Shortfall</span><b id="k-short">—</b></div>
+    </div>
+    <div class="tabs">
+      <button class="tab" data-pop="p-ctrl">Controls</button>
+      <button class="tab" data-pop="p-compare">Compare</button>
+      <button class="tab" data-pop="p-shap">Shapley</button>
+      <button class="tab" data-pop="p-day">Event day</button>
+      <button class="tab" data-pop="p-how">How it works</button>
+    </div>
+  </div>
+
+  <div class="float pop" id="p-ctrl">
+    <h3>Controls <button data-close>×</button></h3>
+    <p>Change the call and watch the targeted subgrid re-solve. Click any zone on the map to take it out, as if its feeder had an outage.</p>
+    <div class="ctrl"><label>Requested <b id="mw-v"></b></label><input id="mw" type="range" min="5" max="60" step="1"></div>
+    <div class="ctrl"><label>Zone activation cost <b id="f-v"></b></label><input id="f" type="range" min="0" max="3" step="0.05"></div>
+    <div class="ctrl"><label>Feeder hosting limits <b id="h-v"></b></label><input id="h" type="range" min="0.5" max="1.5" step="0.05"></div>
+    <button class="reset" id="reset">Reset to defaults</button>
+  </div>
+
+  <div class="float pop" id="p-compare">
+    <h3>Compare policies <button data-close>×</button></h3>
+    <p>Wear is fleet capacity lost, summed over batteries (battery-equivalents), weighted for stale telemetry.</p>
+    <table id="compare"></table>
+    <div class="note" id="compare-note"></div>
+  </div>
+
+  <div class="float pop" id="p-shap">
+    <h3>Shapley credit <button data-close>×</button></h3>
+    <p>Each targeted zone's average marginal contribution to the coalition's value, over 128 seeded orderings. The shares sum to the coalition's value, a fair basis for splitting the utility's payment.</p>
+    <svg id="shap" viewBox="0 0 360 220" style="width:100%;height:220px"></svg>
+  </div>
+
+  <div class="float pop" id="p-day">
+    <h3>The event day <button data-close>×</button></h3>
+    <p>LZ_AEN day-ahead price (orange) and Austin temperature (green), hourly, America/Chicago. The shaded band is the 90-minute response.</p>
+    <svg id="day" viewBox="0 0 360 160" style="width:100%;height:160px"></svg>
+  </div>
+
+  <div class="float pop how" id="p-how">
+    <h3>How the game works <button data-close>×</button></h3>
+    <ol>
+      <li><b>Price and best response (Stackelberg).</b> The utility posts a flexibility price λ. Each feeder zone offers every kW whose marginal wear is at or below λ, up to its hosting limit. Marginal wear folds in enclosure heat, BMS health, cycles, C-rate, and stale telemetry. λ* is the lowest price that covers the call. At λ* no battery can lower its own wear by changing its power, so the dispatch is a Nash equilibrium of the zones' best responses.</li>
+      <li><b>Coalition.</b> Calling a zone has a fixed activation cost. Zones are dropped, then added, while wear plus activation plus any shortfall penalty keeps falling. What remains is the targeted subgrid.</li>
+      <li><b>Credit (Shapley).</b> The coalition's value is split by each zone's average marginal contribution.</li>
+    </ol>
+    <p class="note">Anomaly rule, fixed before the first run: a 4CP candidate call, an LZ_AEN day-ahead hour at or above $100/MWh and 3× the trailing 30-day median, or an Austin high more than 2σ above its trailing 30-day mean. April–September 2025.</p>
+  </div>
+
+  <div class="float" id="legend">
+    <div><i class="sw" style="background:var(--dark)"></i>targeted zone, high share</div>
+    <div><i class="sw" style="background:var(--lime-soft)"></i>targeted zone, low share</div>
+    <div><i class="sw" style="background:#e4e2de"></i>not called</div>
+    <div><i class="sw" style="background:#e8a59f"></i>out (you clicked it)</div>
+    <div><i class="sw" style="background:var(--sky);border-radius:50%"></i>cool battery</div>
+    <div><i class="sw" style="background:var(--energy);border-radius:50%"></i>sun-baked battery</div>
+    <div><i class="sw" style="background:var(--ink);border-radius:50%"></i>stale telemetry</div>
+  </div>
+
+  <div id="foot"><b>Synthetic fleet, synthetic feeder zones.</b> LZ_AEN prices, ERCOT load and 4CP intervals, and Austin weather (Open-Meteo, CC BY 4.0) are real 2025 data. Not Austin Energy's feeder map, not Base Power telemetry.</div>
+
+  <div class="float" id="timeline">
+    <div class="t"><span id="tl-title">2025 anomalies · click a bar or use ← →</span><span><i class="sw" style="background:var(--dark);display:inline-block"></i> 4CP call &nbsp; <i class="sw" style="background:var(--energy);display:inline-block"></i> price spike &nbsp; <i class="sw" style="background:var(--gold);display:inline-block"></i> heat &nbsp; ● caught a 4CP interval</span></div>
+    <canvas id="tl"></canvas>
+  </div>
+</div>
+
+<script>/*GAME_JS*/</script>
+<script id="payload" type="application/json">{{payload}}</script>
+<script>
+(function(){
+const D = JSON.parse(document.getElementById('payload').textContent);
+const G = window.RunwayGame;
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (x, d=2) => (x===null||x===undefined||!isFinite(x)) ? '—' : Number(x).toFixed(d);
+const events = D.events;
+const state = { i: Math.max(0, events.findIndex(e => e.types.includes('price_spike') && e.types.includes('4cp_candidate'))), out: new Set(), mw: null, f: 1, h: 1, res: null, hover: null };
+
+function mix(a, b, t){ const p=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)); const A=p(a),B=p(b); return `rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`; }
+function setupCanvas(c){ const dpr=window.devicePixelRatio||1, w=c.clientWidth, h=c.clientHeight; c.width=w*dpr; c.height=h*dpr; const g=c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); return {g,w,h}; }
+function roundRect(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+
+// ---- popups ----
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  const id = b.dataset.pop, open = $(id).classList.contains('show');
+  document.querySelectorAll('.pop').forEach(p => p.classList.remove('show'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  if(!open){ $(id).classList.add('show'); b.classList.add('on'); }
+});
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => {
+  b.closest('.pop').classList.remove('show'); document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+});
+
+// ---- map ----
+const lat0=Math.min(...D.zones.map(z=>z.cell[0])), lat1=Math.max(...D.zones.map(z=>z.cell[1]));
+const lon0=Math.min(...D.zones.map(z=>z.cell[2])), lon1=Math.max(...D.zones.map(z=>z.cell[3]));
+const KX=Math.cos(30.27*Math.PI/180);
+let zoneRects=[];
+function drawMap(){
+  const res=state.res, e=events[state.i], c=$('map'), {g,w,h}=setupCanvas(c);
+  const compact = document.body.classList.contains('compact');
+  const padL = compact ? 12 : 352, padR = compact ? 12 : 332, padT = compact ? 58 : 16, padB = compact ? 150 : 118;
+  const W=w-padL-padR, H=h-padT-padB, s=Math.min(W/((lon1-lon0)*KX), H/(lat1-lat0));
+  const ox=padL+(W-(lon1-lon0)*KX*s)/2, oy=padT+(H-(lat1-lat0)*s)/2;
+  const proj=(la,lo)=>[ox+(lo-lon0)*KX*s, oy+(lat1-la)*s];
+  g.clearRect(0,0,w,h);
+  const kw=new Map(), maxKw=Math.max(1,...res.dispatch_kw);
+  res.members.forEach((id,j)=>kw.set(id,res.dispatch_kw[j]));
+  const shap=new Map(); const tot=res.shapley.reduce((a,b)=>a+b,0)||1; res.members.forEach((id,j)=>shap.set(id,res.shapley[j]/tot));
+  zoneRects=D.zones.map((z,k)=>{ const [a,b]=proj(z.cell[1],z.cell[2]), [c2,d]=proj(z.cell[0],z.cell[3]); return {z,k,x:a,y:b,w:c2-a,h:d-b}; });
+  for(const r of zoneRects){
+    const out=state.out.has(r.z.id), t=kw.has(r.z.id)?kw.get(r.z.id)/maxKw:null, hov=state.hover===r.k;
+    roundRect(g,r.x+2,r.y+2,r.w-4,r.h-4,10);
+    g.fillStyle = out ? '#e8a59f' : (t!==null ? mix(css('--lime-soft'), css('--dark'), Math.min(1,t)) : '#e4e2de');
+    g.fill();
+    g.lineWidth = hov ? 3 : (t!==null ? 2 : 1); g.strokeStyle = hov ? css('--ink') : (t!==null ? css('--lime') : '#d3d1cc'); g.stroke();
+  }
+  const stale=new Set(e.stale_units);
+  D.units.forEach(([la,lo,ex],u)=>{ const [x,y]=proj(la,lo);
+    g.fillStyle = stale.has(u) ? '#292826' : (ex<0.5 ? mix(css('--sky'),'#f9d77d',ex*2) : mix('#f9d77d',css('--energy'),(ex-0.5)*2));
+    g.globalAlpha = stale.has(u) ? 1 : 0.42; g.beginPath(); g.arc(x,y,stale.has(u)?2.6:1.15,0,7); g.fill(); });
+  g.globalAlpha=1;
+  g.font = document.body.classList.contains('compact') ? '600 10px sans-serif' : '600 12px sans-serif';
+  const placed=[];
+  const overlaps=(a)=>placed.some(b=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y);
+  for(const L of D.landmarks){ const [x,y]=proj(L.lat,L.lon);
+    g.fillStyle='#ffffff'; g.beginPath(); g.arc(x,y,5,0,7); g.fill(); g.strokeStyle=css('--ink'); g.lineWidth=2; g.stroke(); g.lineWidth=1;
+    if(document.body.classList.contains('compact') && L.name !== 'Downtown') continue;
+    const tw=g.measureText(L.name).width+10, lh=document.body.classList.contains('compact')?16:20;
+    const tries=[[8,-10],[-tw-8,-10],[8,10],[-tw-8,10],[8,-30],[-tw-8,-30],[8,30]];
+    let box=null; for(const [dx,dy] of tries){ const b={x:x+dx,y:y+dy,w:tw,h:lh}; if(!overlaps(b)){ box=b; break; } }
+    if(!box) box={x:x+8,y:y-10,w:tw,h:20};
+    placed.push(box);
+    if(Math.abs(box.y-(y-10))>1 || box.x<x){ g.strokeStyle='rgba(41,40,38,.5)'; g.beginPath(); g.moveTo(x,y); g.lineTo(box.x+(box.x<x?box.w:0),box.y+10); g.stroke(); }
+    g.fillStyle='rgba(255,255,255,.92)'; roundRect(g,box.x,box.y,box.w,box.h,6); g.fill(); g.fillStyle=css('--ink'); g.fillText(L.name,box.x+5,box.y+lh-5); }
+  for(const r of zoneRects){
+    if(!kw.has(r.z.id) || r.w < 34 || r.h < 24) continue;
+    const t=kw.get(r.z.id)/maxKw, light = t > 0.45, big = r.w >= 60 && r.h >= 44;
+    g.fillStyle = light ? '#ffffff' : css('--darker');
+    g.font = big ? '600 13px sans-serif' : '600 10px sans-serif';
+    const label = big ? `${fmt(kw.get(r.z.id)/1000,1)} MW` : fmt(kw.get(r.z.id)/1000,1);
+    const lw = g.measureText(label).width;
+    if(lw > r.w - 10) continue;
+    const lb = {x:r.x+(big?10:6), y:r.y+(big?9:5), w:lw, h:big?16:12};
+    if(overlaps(lb)) continue;
+    g.fillText(label, r.x+(big?10:6), r.y+(big?22:15));
+    if(big){ g.font='11px sans-serif'; g.globalAlpha=.85; g.fillText(`${fmt(100*shap.get(r.z.id),0)}% credit`, r.x+10, r.y+37); g.globalAlpha=1; }
+  }
+}
+function zoneAt(ev){ const r=$('map').getBoundingClientRect(), x=ev.clientX-r.left, y=ev.clientY-r.top;
+  return zoneRects.find(z=>x>=z.x&&x<=z.x+z.w&&y>=z.y&&y<=z.y+z.h); }
+$('map').onclick = ev => { const hit=zoneAt(ev); if(!hit) return;
+  if(state.out.has(hit.z.id)) state.out.delete(hit.z.id); else state.out.add(hit.z.id); update(); };
+$('map').onmousemove = ev => {
+  const hit=zoneAt(ev), tip=$('tip');
+  const k = hit ? hit.k : null;
+  if(k!==state.hover){ state.hover=k; drawMap(); }
+  if(!hit){ tip.style.display='none'; return; }
+  const e=events[state.i], z=e.zones[hit.k], res=state.res, j=res.members.indexOf(hit.z.id);
+  const tot=res.shapley.reduce((a,b)=>a+b,0)||1;
+  const status = state.out.has(hit.z.id) ? 'out: click to restore' : (j>=0 ? `<b>targeted</b>: ${fmt(res.dispatch_kw[j]/1000,2)} MW, ${fmt(100*res.shapley[j]/tot,1)}% credit` : 'not called');
+  tip.innerHTML = `<div style="font-weight:600;margin-bottom:2px">Zone ${hit.z.id}</div>${status}<br>${hit.z.n_units} batteries · hosting limit ${fmt(z.host_kw*state.h/1000,2)} MW<br><span style="opacity:.7">click to ${state.out.has(hit.z.id)?'restore':'take out'}</span>`;
+  const r=$('stage').getBoundingClientRect(); tip.style.display='block';
+  tip.style.left=Math.min(ev.clientX-r.left+14, r.width-250)+'px'; tip.style.top=(ev.clientY-r.top+14)+'px';
+};
+$('map').onmouseleave = () => { $('tip').style.display='none'; if(state.hover!==null){ state.hover=null; drawMap(); } };
+
+// ---- timeline ----
+const DAY0=new Date(D.rule.window[0]+'T00:00:00Z'), DAY1=new Date(D.rule.window[1]+'T00:00:00Z'), NDAYS=Math.round((DAY1-DAY0)/864e5)+1;
+function drawTimeline(){
+  const {g,w,h}=setupCanvas($('tl')), pad=4, bw=(w-2*pad)/NDAYS;
+  g.clearRect(0,0,w,h);
+  g.fillStyle=css('--muted'); g.font='10px sans-serif';
+  for(let m=3;m<=8;m++){ const d=new Date(Date.UTC(2025,m,1)), x=pad+(d-DAY0)/864e5*bw; g.fillRect(x,h-12,1,4); g.fillText(d.toLocaleString('en-US',{month:'short',timeZone:'UTC'}),x+3,h-2); }
+  events.forEach((e,i)=>{ const x=pad+(new Date(e.day+'T00:00:00Z')-DAY0)/864e5*bw, bh=10+26*Math.max(.15,e.severity);
+    const pr=e.types.includes('price_spike'), ht=e.types.includes('heat');
+    g.fillStyle = pr?css('--energy'):ht?css('--gold'):css('--dark'); g.fillRect(x,h-14-bh,Math.max(bw-1,2),bh);
+    if(e.hit_4cp){ g.fillStyle=css('--lime'); g.beginPath(); g.arc(x+bw/2,h-19-bh,3,0,7); g.fill(); }
+    if(i===state.i){ g.strokeStyle=css('--ink'); g.lineWidth=2; g.strokeRect(x-2,2,Math.max(bw-1,2)+4,h-16); g.lineWidth=1; } });
+  $('tl').onclick = ev => { const r=$('tl').getBoundingClientRect(), day=(ev.clientX-r.left-pad)/bw;
+    let best=0, bd=1e9; events.forEach((e,i)=>{ const d=Math.abs((new Date(e.day+'T00:00:00Z')-DAY0)/864e5-day); if(d<bd){bd=d;best=i;} }); pick(best); };
+  $('tl-title').textContent = `2025 anomalies · ${state.i+1} of ${events.length} · click a bar or use ← →`;
+}
+
+// ---- panels ----
+function drawEvent(){
+  const e=events[state.i], chip=(c,t)=>`<span class="chip ${c}">${t}</span>`;
+  $('chips').innerHTML=(e.types.includes('4cp_candidate')?chip('cp','4CP candidate'):'')+(e.hit_4cp?chip('hit','caught a 4CP interval'):'')+
+    (e.types.includes('price_spike')?chip('price','LZ_AEN price spike'):'')+(e.types.includes('heat')?chip('heat','heat anomaly'):'');
+  $('ev-title').textContent=new Date(e.start_utc).toLocaleString('en-US',{timeZone:'America/Chicago',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+' CT';
+  $('facts').innerHTML=[['Austin at the call',`${fmt(e.ambient_c,1)} °C`],['LZ_AEN day-ahead max',`$${fmt(e.price_max,0)}/MWh`+(e.price_trailing_median?` · ${fmt(e.price_max/e.price_trailing_median,1)}×`:'')],
+    ['Default request',`${e.mw} MW · 90 min`],['Stale telemetry',`${e.stale_units.length} batteries`]].map(([a,b])=>`<div><span>${a}</span><b>${b}</b></div>`).join('');
+  drawDay(e);
+}
+function drawDay(e){
+  const W=360,H=160,p=22,P=e.price_24h,T=e.temp_24h,pm=Math.max(...P,1),tmin=Math.min(...T),tmax=Math.max(...T),X=i=>p+i/23*(W-2*p);
+  const pp=P.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+','+(H-p-v/pm*(H-2*p)).toFixed(1)).join('');
+  const tp=T.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+','+(H-p-(v-tmin)/Math.max(1,tmax-tmin)*(H-2*p)).toFixed(1)).join('');
+  const hr=+new Date(e.start_utc).toLocaleString('en-US',{timeZone:'America/Chicago',hour:'numeric',hour12:false})%24;
+  $('day').innerHTML=`<rect x="${X(hr)}" y="${p-6}" width="${1.5/23*(W-2*p)}" height="${H-2*p+6}" fill="${css('--lime-soft')}"/>
+    <path d="${tp}" fill="none" stroke="${css('--dark')}" stroke-width="2"/><path d="${pp}" fill="none" stroke="${css('--energy')}" stroke-width="2"/>
+    <line x1="${p}" y1="${H-p}" x2="${W-p}" y2="${H-p}" stroke="${css('--line')}"/>
+    <text x="${p}" y="11" font-size="10" fill="${css('--energy')}">$${fmt(pm,0)}/MWh peak</text><text x="${W-p-80}" y="11" font-size="10" fill="${css('--dark')}">${fmt(tmax,1)} °C high</text>
+    <text x="${p}" y="${H-6}" font-size="9" fill="${css('--muted')}">0:00</text><text x="${W/2-12}" y="${H-6}" font-size="9" fill="${css('--muted')}">12:00</text><text x="${W-p-22}" y="${H-6}" font-size="9" fill="${css('--muted')}">23:00</text>`;
+}
+function drawShapley(res){
+  const svg=$('shap'), W=360, H=220, p=8;
+  if(!res.members.length){ svg.innerHTML=`<text x="10" y="30" fill="${css('--muted')}">No zones targeted.</text>`; return; }
+  const rows=res.members.map((id,j)=>({id,v:res.shapley[j],kw:res.dispatch_kw[j]})).sort((a,b)=>b.v-a.v), tot=rows.reduce((s,r)=>s+r.v,0)||1;
+  const top=rows.slice(0,10), vmax=Math.max(...top.map(r=>Math.abs(r.v)))||1, rh=(H-2*p)/top.length;
+  svg.innerHTML=top.map((r,i)=>{ const y=p+i*rh, bw=Math.abs(r.v)/vmax*(W-150);
+    return `<text x="0" y="${y+rh*0.65}" font-size="11" fill="${css('--ink')}">${r.id}</text><rect x="46" y="${y+3}" width="${bw}" height="${rh-6}" rx="4" fill="${r.v>=0?css('--dark'):css('--gridoff')}"/>
+      <text x="${50+bw}" y="${y+rh*0.65}" font-size="10" fill="${css('--muted')}">${fmt(100*r.v/tot,1)}% · ${fmt(r.kw/1000,2)} MW</text>`; }).join('') +
+    (rows.length>10?`<text x="0" y="${H-1}" font-size="10" fill="${css('--muted')}">+${rows.length-10} more zones</text>`:'');
+}
+
+function update(){
+  const e=events[state.i], zones=e.zones, R=state.mw*1000, F=e.activation_cost*state.f;
+  $('mw-v').textContent=`${state.mw} MW`; $('f-v').textContent=`${fmt(state.f,2)}× default`; $('h-v').textContent=`${fmt(state.h,2)}×`;
+  const res=G.solve(zones,{R,F,hostMul:state.h,out:[...state.out],M:128,seed:7}); state.res=res;
+  const allowed=zones.map((_,i)=>i).filter(i=>!state.out.has(zones[i].id));
+  const free=G.equilibrium(zones,allowed,R,1e9);
+  const nUnits=allowed.reduce((s,i)=>s+D.zones[i].n_units,0), pEven=R/Math.max(1,nUnits);
+  let evenWear=0,evenViol=0,evenKw=0;
+  for(const i of allowed){ const z=zones[i],k=Math.min(19.999,pEven),a=Math.floor(k),t=k-a; evenWear+=z.even[a]+(z.even[a+1]-z.even[a])*t;
+    const kw=Math.min(pEven*D.zones[i].n_units,z.kw[z.kw.length-1]); evenKw+=kw; if(kw>z.host_kw*state.h+1e-6) evenViol++; }
+  const freeViol=allowed.filter((i,j)=>free.dispatch[j]>zones[i].host_kw*state.h+1e-6).length;
+  const units=res.members.reduce((s,id)=>s+D.zones.find(z=>z.id===id).n_units,0);
+  $('r-big').textContent = document.body.classList.contains('compact') ? `${res.members.length} of ${allowed.length} zones · ${res.wear>=evenWear?'+':''}${fmt(100*(res.wear/evenWear-1),1)}% wear vs even` : `${res.members.length} of ${allowed.length} zones`;
+  $('r-sub').textContent=`${units.toLocaleString()} batteries carry ${fmt((R-res.shortfall_kw)/1000,1)} MW, every feeder within its hosting limit, no reserve touched.`;
+  $('k-lam').textContent=res.lam===null?'—':res.lam.toExponential(2);
+  $('k-even').textContent=`${res.wear>=evenWear?'+':''}${fmt(100*(res.wear/evenWear-1),1)}%`;
+  $('k-short').textContent=`${fmt(res.shortfall_kw/1000,2)} MW`;
+  const rows=[['Game-theoretic subgrid',res.wear,0,res.members.length],['Even spread, every unit',evenWear,evenViol,allowed.length],['Water-fill, no feeder limits',free.wear,freeViol,free.dispatch.filter(d=>d>1e-9).length]];
+  $('compare').innerHTML=`<tr><th>policy</th><th>wear</th><th>feeders overloaded</th><th>zones</th></tr>`+
+    rows.map((r,k)=>`<tr class="${k===0?'best':''}"><td>${r[0]}</td><td>${fmt(r[1],4)}</td><td class="${r[2]?'bad':''}">${r[2]}</td><td>${r[3]}</td></tr>`).join('');
+  const u=e.units, isDefault=state.mw===e.mw&&state.f===1&&state.h===1&&state.out.size===0;
+  $('compare-note').textContent=isDefault?`Unit-level check at these defaults (Python): ${u.game.units_dispatched.toLocaleString()} batteries dispatched, ${u.game.reserve_violations} reserve and ${u.game.feeder_violations} feeder violations; true wear ${fmt(u.game.true_wear,4)} vs even ${fmt(u.even.true_wear,4)} (${u.even.feeder_violations} feeders overloaded) vs unconstrained ${fmt(u.unconstrained.true_wear,4)} (${u.unconstrained.feeder_violations}). Staying inside feeder limits costs some wear.`:
+    'Re-solved in your browser on the zone supply curves. Reset to defaults to see the unit-level Python check.';
+  drawMap(); drawShapley(res); drawTimeline();
+}
+function pick(i){ state.i=(i+events.length)%events.length; state.out.clear(); state.mw=events[state.i].mw; state.f=1; state.h=1;
+  $('mw').value=state.mw; $('f').value=1; $('h').value=1; drawEvent(); update(); }
+$('mw').oninput=ev=>{state.mw=+ev.target.value; update();};
+$('f').oninput=ev=>{state.f=+ev.target.value; update();};
+$('h').oninput=ev=>{state.h=+ev.target.value; update();};
+$('reset').onclick=()=>pick(state.i);
+$('prev').onclick=()=>pick(state.i-1); $('next').onclick=()=>pick(state.i+1);
+document.addEventListener('keydown',ev=>{ if(ev.key==='ArrowRight') pick(state.i+1); if(ev.key==='ArrowLeft') pick(state.i-1); if(ev.key==='Escape') document.querySelectorAll('[data-close]').forEach(b=>b.closest('.pop').classList.contains('show')&&b.click()); });
+function layout(){ document.body.classList.toggle('compact', innerWidth < 1100 || innerHeight < 720); }
+$('ev-title').onclick=()=>{ if(document.body.classList.contains('compact')) $('event').classList.toggle('open'); };
+window.addEventListener('resize',()=>{ layout(); update(); });
+layout();
+pick(state.i);
+})();
+</script>
+</body>
+</html>

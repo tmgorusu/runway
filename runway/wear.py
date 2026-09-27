@@ -17,7 +17,8 @@ STAMP = OUTPUTS / "wear_inputs.json"
 def _inputs() -> dict:
     from runway import calendar
     from runway import telemetry
-    files = [calendar.CALLS, CALLING_RULE, PHYSICS / "blast_lite_reference.csv", telemetry.MANIFEST,
+    from runway.paths import DATA
+    files = [calendar.CALLS, CALLING_RULE, PHYSICS / "blast_lite_reference.csv", telemetry.MANIFEST, DATA / "manifest.json",
              *sorted(ASSUMPTIONS.glob("*.json"))]
     return {str(f.relative_to(CALLING_RULE.parent)): hashlib.sha256(f.read_bytes()).hexdigest()
             for f in files if f.exists()}
@@ -33,8 +34,10 @@ def run() -> dict:
     ov = overlay.build()
     s = replay.run([c for c, _ in read_calls()], daily=daily_mean_austin())
     physics_lines.write()
+    from runway import austin
+    aus = austin.build()
     write_json(STAMP, _inputs())
-    return {"hero": h, "overlay": ov, "summary": s, "telemetry_fit": fit}
+    return {"hero": h, "overlay": ov, "summary": s, "telemetry_fit": fit, "austin_events": len(aus["events"])}
 
 
 def ensure() -> bool:
@@ -44,7 +47,8 @@ def ensure() -> bool:
         calendar.run()
     fresh = STAMP.exists() and read_json(STAMP) == _inputs() and all(
         (OUTPUTS / p).exists() for p in ("track1/hero.json", "replay/summary.json", "physics/blast_overlay.json",
-                                         "telemetry/fleet_estimates.parquet", "physics/telemetry_fit.json"))
+                                         "telemetry/fleet_estimates.parquet", "physics/telemetry_fit.json",
+                                         "austin/events.json")) and (CALLING_RULE.parent / "web" / "austin.html").exists()
     if not fresh:
         run()
     else:

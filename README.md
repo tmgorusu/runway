@@ -29,6 +29,20 @@ Every number below comes from a file the one command writes.
 - Called every day for ten years (the over-call fixture), every policy loses the same 236 units.
 - The Runway effect rests on the cycle-aging activation energy. With BLAST-Lite's small-cell LFP data, where temperature doesn't affect cycling, the hot/cool difference disappears (ratio 1.000).
 
+## Austin anomaly map
+
+![Austin anomaly map: targeted feeder zones for the July 30, 2025 4CP call](docs/img/austin.png)
+
+`web/austin.html` is an interactive map of the Austin Energy territory. It covers the 58 anomaly days between April and September 2025 under a rule fixed before the first run: 52 4CP candidate calls, 10 LZ_AEN day-ahead price spikes, and 2 heat anomalies. For each day it picks which of 30 synthetic feeder zones to call, using three layers:
+
+- **Clearing price (Stackelberg).** The utility posts a flexibility price. Each zone offers every kW whose marginal wear is at or below that price, up to its hosting limit. Marginal wear includes enclosure heat, BMS health, cycles, C-rate, and stale telemetry.
+- **Coalition.** Calling a zone has a fixed activation cost, so a local search drops and adds zones until wear plus activation cost stops falling. The zones left are the targeted subgrid.
+- **Shapley credit.** Each zone's share of the coalition's value, a fair basis for splitting the payment.
+
+Click a zone to simulate a feeder outage, or drag the request, activation-cost, and hosting-limit sliders; the browser re-solves in under 100 ms. A test runs the browser solver in Node and checks it matches the Python solver exactly.
+
+On the July 30 4CP call, the game targets 22 of 30 zones and 3,523 batteries, with no feeder overloaded and no reserve touched. That costs 5.5% more true wear than even spread (10.7% on the stale-telemetry-weighted cost the game optimizes); even spread overloads 7 feeders. The feeder zones and hosting limits are synthetic assumptions, not Austin Energy's feeder map (`outputs/austin/events.json`).
+
 ## Run it
 
 Python 3.12+. The network is needed only to install.

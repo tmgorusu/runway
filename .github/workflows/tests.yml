@@ -1,0 +1,21 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - name: Offline test suite (every test blocks the network)
+        run: uv run pytest -q
+      - name: One-command demo, network blocked
+        run: |
+          mkdir -p /tmp/nonet
+          printf 'import socket\ndef _b(*a, **k):\n    raise RuntimeError("network disabled")\nsocket.socket.connect = _b\nsocket.create_connection = _b\n' > /tmp/nonet/sitecustomize.py
+          PYTHONPATH=/tmp/nonet uv run python -m runway.demo --seed 7 --fault offline_wave

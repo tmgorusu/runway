@@ -1,6 +1,6 @@
 # Machine specification
 Owner: the hacker building the running system.
-Machine produces the cache, the calendar, the runway water-fill, the workers, the dispatcher, the benchmark, the dashboard, and the one-command demo. Wear produces temperature, aging, the wear scalar, the baselines, the hero ratio, and the replay. The merged picture is `specs/VISION.md`. This file is the half Machine can build and test alone.
+Machine produces the cache, the calendar, the runway water-fill, the workers, the dispatcher, the benchmark, the dashboard, and the one-command demo. Wear produces temperature, aging, the wear scalar, the baselines, the hero ratio, and the replay. The merged picture is [VISION.md](VISION.md). This file is the half Machine can build and test alone.
 ## 1. Responsibility
 Machine implements and owns:
 - `runway/contracts.py`

@@ -229,7 +229,7 @@ def run_chaos(seed: int = 7, fault: str = "offline_wave", n: int = 2000,
 
 
 def metrics(r: dict) -> dict:
-    """outputs/track2/metrics.json, exactly the MACHIENE.md section 5 shape."""
+    """outputs/track2/metrics.json, exactly the docs/MACHINE.md section 5 shape."""
     return {
         "seed": r["seed"],
         "n_units": r["n_units"],

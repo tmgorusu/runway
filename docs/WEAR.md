@@ -1,6 +1,6 @@
 # Wear specification
 Owner: the battery-dynamics researcher.
-Wear produces every number about temperature, aging, and the ERCOT wear ratio. Machine produces the cache, the water-fill shell, the workers, the dispatcher, and the demo. The merged picture is `specs/VISION.md`. This file is the half Wear can build and test alone.
+Wear produces every number about temperature, aging, and the ERCOT wear ratio. Machine produces the cache, the water-fill shell, the workers, the dispatcher, and the demo. The merged picture is [VISION.md](VISION.md). This file is the half Wear can build and test alone.
 ## 1. Responsibility
 Wear implements and owns:
 - `CALLING_RULE.md` (the text; Machine executes it)
@@ -21,7 +21,7 @@ Wear does not edit `allocate.py`, `dispatcher.py`, `worker.py`, `ingest.py`, `ca
 - The integration substep inside a 90-minute call.
 - Whether the cold-charge term ships. It is first on Wear's cut list.
 ## 3. Decisions already closed
-Wear's council inherits these. They are specified in `specs/VISION.md` and are not reopened here.
+Wear's council inherits these. They are specified in [VISION.md](VISION.md) and are not reopened here.
 - Hero ratio is wear per kWh on misses divided by wear per kWh on hits, authored by **even spread**, for June–September 2025, nominal set, with low and high beside it, plus the fraction of wear on misses.
 - A ratio near 1.0 is a valid result. `CALLING_RULE.md` stays at 0.97.
 - Reserve default 0.30 and replacement at health 0.70 are labeled assumptions.

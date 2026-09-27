@@ -1,0 +1,6 @@
+# Runtime and test dependencies for pip users (uv users: `uv sync`). Python 3.12+.
+numpy>=2.0
+pandas>=2.2
+pyarrow>=16
+scipy>=1.11
+pytest>=8

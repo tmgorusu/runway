@@ -1,4 +1,4 @@
-"""Shared contract between Machine and Wear. See VISION.md section 3.
+"""Shared contract between Machine and Wear. See docs/VISION.md section 3.
 
 Hardware is Base Core: 20 kW, 39.2 kWh, LFP. Every fleet built in this repo is
 synthetic; there is no Base telemetry here.

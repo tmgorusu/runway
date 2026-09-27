@@ -56,10 +56,10 @@ def test_summary_schema(small):
 
 
 def test_over_call_fixture_fails_all_policies():
-    """Pre-registered: 4,000 units, daily call at 44.0 C, 10 repeated years, nominal set."""
-    units = make_fleet(4000)
-    steps = replay.over_call_steps()
-    results = {p: replay.run_fleet(units, steps, p, "nominal", 40.0, resolve_every=3) for p in replay.POLICIES}
+    """VISION invariant 6: the saturated fleet (2,000 units asked for 40 MW), called daily at 44.0 C for 10
+    repeated years, puts units below the replacement line under every policy."""
+    results = replay.over_call_results()
     print({p: (r["early_replacements"], round(r["min_health"], 4)) for p, r in results.items()})
     assert all(r["reserve_violations"] == 0 for r in results.values())
     assert all(r["early_replacements"] >= 1 for r in results.values())
+    assert all(r["shortfall_calls"] >= 1 for r in results.values())

@@ -102,10 +102,14 @@ def run(seed: int = 7, fault: str = "offline_wave", n: int | None = None) -> dic
         "solve_ms": r["solve_ms"],
         "units": unit_rows(r),
     }) + "\n")
-    from runway import wear, web
+    from runway import bench, video_script, wear, web
 
     wear.ensure()  # hero.json, summary.json, blast_overlay.json, PHYSICS_LINES.md (cached on inputs)
+    stale = not bench.OUT.exists() or json.loads(bench.OUT.read_text()).get("cost") != cost_name()
+    if stale and OUT == ingest.ROOT / "outputs":
+        bench.main([])
     web.build()
+    video_script.write()
     return {"metrics": m, "rows": rows, "raw": r}
 
 

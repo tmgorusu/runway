@@ -64,7 +64,7 @@ def lines() -> list[tuple[str, str]]:
                     "leveling cannot create megawatts.", "outputs/replay/summary.json"))
         oc = detail["over_call_fixture"]["results"]
         if oc:
-            out.append((f"Over-call fixture (repeated year, 44 °C, daily call, 10 years): early replacements runway "
+            out.append((f"Over-call fixture (2,000 units asked for 40 MW, repeated year, 44 °C, daily call, 10 years; every unit at its cap): early replacements runway "
                         f"{oc['runway']['early_replacements']}, even {oc['even']['early_replacements']}, most-charge "
                         f"{oc['most_charge']['early_replacements']}. over_call_all_policies_fail = {summ['over_call_all_policies_fail']}.",
                         "outputs/replay/summary.json, outputs/replay/detail.json"))

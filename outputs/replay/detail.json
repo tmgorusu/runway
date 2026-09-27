@@ -111,7 +111,39 @@
     ]
   },
   "over_call_fixture": {
-    "label": "repeated year: one call per day at 44.0 C ambient, idle daily mean 34.0 C, 10 years, nominal set",
+    "label": "repeated year: 2,000 units asked for 40 MW, one call per day at 44.0 C ambient, idle daily mean 34.0 C, 10 years, nominal set",
+    "results": {
+      "runway": {
+        "total_capacity_fraction_lost": 443.5080670272462,
+        "early_replacements": 255,
+        "reserve_violations": 0,
+        "shortfall_calls": 122,
+        "max_shortfall_kw": 13898.745284838697,
+        "solves": 122,
+        "min_health": 0.685319001980562
+      },
+      "even": {
+        "total_capacity_fraction_lost": 443.5080670272462,
+        "early_replacements": 255,
+        "reserve_violations": 0,
+        "shortfall_calls": 122,
+        "max_shortfall_kw": 13898.745284838697,
+        "solves": 122,
+        "min_health": 0.685319001980562
+      },
+      "most_charge": {
+        "total_capacity_fraction_lost": 443.5080670272462,
+        "early_replacements": 255,
+        "reserve_violations": 0,
+        "shortfall_calls": 122,
+        "max_shortfall_kw": 13898.745284838697,
+        "solves": 122,
+        "min_health": 0.685319001980562
+      }
+    }
+  },
+  "over_call_fixture_4000_feasible": {
+    "label": "earlier pre-registered fixture, kept for the record: 4,000 units at the feasible MW, same schedule",
     "results": {
       "runway": {
         "total_capacity_fraction_lost": 619.5647969010433,

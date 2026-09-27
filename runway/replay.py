@@ -6,8 +6,11 @@ the feasible megawatt level, reject any reserve breach, add the call-attributabl
 wear from step_thermal and age, then the cycle wear of recharging at
 recharge_kw. Units whose health falls below 0.70 count as early replacements.
 
-The over-call fixture repeats one hot call per day for 10 years and is labeled
-as a repeated year. It integrates in 10-day chunks and re-solves every 30 days.
+The over-call fixture is the saturated fleet: 2,000 units asked for 40 MW, one call
+per day at 44 °C for 10 repeated years, labeled as a repeated year. Every healthy
+unit is at its cap, so leveling has nothing to move and every policy hits the
+replacement line. The earlier 4,000-unit fixture at the feasible MW is still run
+and recorded in detail.json. Both integrate in 10-day chunks and re-solve every 30 days.
 """
 from __future__ import annotations
 
@@ -39,6 +42,8 @@ MW_GRID_STEP = 0.5
 OVER_CALL_AMBIENT_C = 44.0
 OVER_CALL_IDLE_C = 34.0
 OVER_CALL_YEARS = 10
+OVER_CALL_UNITS = 2000
+OVER_CALL_MW = 40.0
 
 
 @dataclass
@@ -130,6 +135,13 @@ def over_call_steps(chunk_days: int = 10, years: int = OVER_CALL_YEARS) -> list[
             for i in range(n)]
 
 
+def over_call_results(seed: int = 7, steps: list[Step] | None = None) -> dict:
+    """The saturated fleet called every day for 10 repeated years."""
+    units = make_fleet(OVER_CALL_UNITS, seed)
+    steps = steps or over_call_steps()
+    return {pol: run_fleet(units, steps, pol, "nominal", OVER_CALL_MW, resolve_every=3) for pol in POLICIES}
+
+
 def feasible_mw(units, calls: list[Call], start_mw: float = 40.0) -> float:
     """Largest MW on a 0.5 MW grid at which all three policies have zero shortfall on every call."""
     state = unit_arrays(units)
@@ -173,11 +185,12 @@ def run(calls: list[Call], n: int = 4000, seed: int = 7, sets=SETS, over_call: b
     rankings = {s: sorted(POLICIES, key=lambda pol: (season[s][pol]["total_capacity_fraction_lost"], pol)) for s in sets}
     flipped = len({tuple(r) for r in rankings.values()}) > 1
     nominal = season["nominal"]
-    over = {}
+    over, over_4000 = {}, {}
     if over_call:
-        o_units = make_fleet(4000, seed)
         o_steps = over_call_steps()
-        over = {pol: run_fleet(o_units, o_steps, pol, "nominal", mw * 4000 / n, resolve_every=3) for pol in POLICIES}
+        over = over_call_results(seed, o_steps)
+        o_units = make_fleet(4000, seed)
+        over_4000 = {pol: run_fleet(o_units, o_steps, pol, "nominal", mw * 4000 / n, resolve_every=3) for pol in POLICIES}
     summary = {
         "synthetic": True,
         "seed": seed,
@@ -201,8 +214,13 @@ def run(calls: list[Call], n: int = 4000, seed: int = 7, sets=SETS, over_call: b
         "season": season,
         "rankings_by_total_loss": rankings,
         "over_call_fixture": {
-            "label": "repeated year: one call per day at 44.0 C ambient, idle daily mean 34.0 C, 10 years, nominal set",
+            "label": "repeated year: 2,000 units asked for 40 MW, one call per day at 44.0 C ambient, idle daily mean "
+                     "34.0 C, 10 years, nominal set",
             "results": over,
+        },
+        "over_call_fixture_4000_feasible": {
+            "label": "earlier pre-registered fixture, kept for the record: 4,000 units at the feasible MW, same schedule",
+            "results": over_4000,
         },
     }
     if out_path is not None:

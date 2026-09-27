@@ -1,5 +1,7 @@
 # Runway
 
+[![tests](https://github.com/tmgorusu/runway/actions/workflows/tests.yml/badge.svg)](https://github.com/tmgorusu/runway/actions/workflows/tests.yml)
+
 **Wear-aware dispatch for utility-called home batteries.** When a utility calls a fleet of home batteries for 40 MW, Runway decides which homes deliver it. The same kWh costs a sun-baked battery more of its life than a shaded one, so Runway fills the megawatts where they wear the fleet least. It never draws backup reserve, and when the fleet can't cover a call it reports the shortfall.
 
 ![Runway dashboard: seed-7 offline wave on 4,000 synthetic units](docs/img/dashboard.png)

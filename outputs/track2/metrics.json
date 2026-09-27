@@ -1,0 +1,14 @@
+{
+  "seed": 7,
+  "n_units": 4000,
+  "mw_requested": 40.0,
+  "fault": "offline_wave",
+  "fraction_offline": 0.15,
+  "tracking_error_kw": 0.0,
+  "shortfall_kw": 0.0,
+  "reserve_violations": 0,
+  "resole_latency_ms": 39.527,
+  "seq_before": 1,
+  "seq_after": 2,
+  "cost": "stub"
+}

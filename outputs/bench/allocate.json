@@ -1,0 +1,25 @@
+{
+  "synthetic": true,
+  "policy": "runway",
+  "cost": "stub",
+  "timer": "time.perf_counter around allocate() only; fleet built outside; no workers",
+  "cpu": "Apple M4",
+  "python": "3.12.12",
+  "sizes": {
+    "1000": {
+      "p50_ms": 1.198,
+      "repeats": 5,
+      "mw_requested": 10.0
+    },
+    "10000": {
+      "p50_ms": 13.604,
+      "repeats": 5,
+      "mw_requested": 100.0
+    },
+    "100000": {
+      "p50_ms": 183.026,
+      "repeats": 5,
+      "mw_requested": 1000.0
+    }
+  }
+}

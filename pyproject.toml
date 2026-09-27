@@ -15,7 +15,7 @@ dependencies = [
 ingest = ["gridstatus>=0.29", "pytz", "requests>=2.31", "openpyxl>=3.1"]
 
 [dependency-groups]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "scipy>=1.11"]
 
 [build-system]
 requires = ["hatchling"]

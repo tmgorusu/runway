@@ -1,11 +1,9 @@
-cost=stub
 committed seq 1
 committed seq 2
 stall at seq 3
 --- SIGKILL ---
 restart: re-sending uncommitted seq 3
 committed seq 3
-cost=stub
 committed seq 4
 committed seq 5
 committed seq 6

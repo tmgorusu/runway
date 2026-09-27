@@ -1,0 +1,8 @@
+{
+  "handoff/calls.parquet": "c133b3fa8defa082071d95324108777dfcb45b4d38c6037fbacdc5f8ea468a6f",
+  "CALLING_RULE.md": "3cf61faa1eada54684dc99916442935381ce399f4ad7ae425988472970a5f2af",
+  "physics/blast_lite_reference.csv": "e709efbc8b3dd3ad363670655eb6ea4f0c4eaaa16be421ca9ba55b7c3ca9b606",
+  "assumptions/high_sensitivity.json": "4ffde221c7266c18bb57f6d75563a32284b29f1c97769af763e0f3fcb447ac20",
+  "assumptions/low_sensitivity.json": "659c472a737b99e763db849d77d78702de289f2023f551e7c206414fe296b67d",
+  "assumptions/nominal.json": "e7f469c0ade8d5e5cbd4850b93c73c9b01279a6c2be5e566a31977bb522df786"
+}

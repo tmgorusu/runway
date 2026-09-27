@@ -1,0 +1,145 @@
+{
+  "synthetic_fleet": true,
+  "data_source": "ERCOT 2025 (EIA-930 load and forecast, NP9-83-M 4CP), Open-Meteo weather",
+  "fleet_n": 4000,
+  "feasible_mw": 40.0,
+  "n_calls": 52,
+  "season": {
+    "nominal": {
+      "runway": {
+        "total_capacity_fraction_lost": 13.363949130084837,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 52,
+        "min_health": 0.8825586893288048
+      },
+      "even": {
+        "total_capacity_fraction_lost": 13.515530602201132,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 52,
+        "min_health": 0.8827515310745165
+      },
+      "most_charge": {
+        "total_capacity_fraction_lost": 14.71209356518714,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 52,
+        "min_health": 0.8817241578889448
+      }
+    },
+    "low_sensitivity": {
+      "runway": {
+        "total_capacity_fraction_lost": 10.938486282041172,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 52,
+        "min_health": 0.8830492478872419
+      },
+      "even": {
+        "total_capacity_fraction_lost": 11.040502763223559,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 52,
+        "min_health": 0.8833026236626863
+      },
+      "most_charge": {
+        "total_capacity_fraction_lost": 11.595919532168665,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 52,
+        "min_health": 0.8827386550838913
+      }
+    },
+    "high_sensitivity": {
+      "runway": {
+        "total_capacity_fraction_lost": 16.61326440962297,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 52,
+        "min_health": 0.8818730776933852
+      },
+      "even": {
+        "total_capacity_fraction_lost": 16.87275733961233,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 52,
+        "min_health": 0.8819358586300717
+      },
+      "most_charge": {
+        "total_capacity_fraction_lost": 19.650647165140448,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 52,
+        "min_health": 0.8800063900496049
+      }
+    }
+  },
+  "rankings_by_total_loss": {
+    "nominal": [
+      "runway",
+      "even",
+      "most_charge"
+    ],
+    "low_sensitivity": [
+      "runway",
+      "even",
+      "most_charge"
+    ],
+    "high_sensitivity": [
+      "runway",
+      "even",
+      "most_charge"
+    ]
+  },
+  "over_call_fixture": {
+    "label": "repeated year: one call per day at 44.0 C ambient, idle daily mean 34.0 C, 10 years, nominal set",
+    "results": {
+      "runway": {
+        "total_capacity_fraction_lost": 619.5647969010433,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 122,
+        "min_health": 0.7258782801968571
+      },
+      "even": {
+        "total_capacity_fraction_lost": 621.75313270022,
+        "early_replacements": 0,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 122,
+        "min_health": 0.7452648311977493
+      },
+      "most_charge": {
+        "total_capacity_fraction_lost": 676.3561802762765,
+        "early_replacements": 303,
+        "reserve_violations": 0,
+        "shortfall_calls": 0,
+        "max_shortfall_kw": 0.0,
+        "solves": 122,
+        "min_health": 0.6869272505973478
+      }
+    }
+  }
+}

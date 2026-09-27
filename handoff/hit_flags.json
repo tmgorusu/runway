@@ -1,0 +1,37 @@
+{
+  "rule_hash": "3cf61faa1eada54684dc99916442935381ce399f4ad7ae425988472970a5f2af",
+  "threshold": 0.97,
+  "system_load_proxy": true,
+  "n_calls": 52,
+  "n_hits": 4,
+  "published_4cp": [
+    {
+      "month": "June",
+      "interval_end_local": "6/19/2025 17:00",
+      "hit": true,
+      "call_id": "4cp-2025-06-19",
+      "miss_reason": ""
+    },
+    {
+      "month": "July",
+      "interval_end_local": "7/30/2025 17:00",
+      "hit": true,
+      "call_id": "4cp-2025-07-30",
+      "miss_reason": ""
+    },
+    {
+      "month": "August",
+      "interval_end_local": "8/18/2025 17:00",
+      "hit": true,
+      "call_id": "4cp-2025-08-18",
+      "miss_reason": ""
+    },
+    {
+      "month": "September",
+      "interval_end_local": "9/04/2025 17:30",
+      "hit": true,
+      "call_id": "4cp-2025-09-04",
+      "miss_reason": ""
+    }
+  ]
+}

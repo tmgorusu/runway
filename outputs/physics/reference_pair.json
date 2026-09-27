@@ -1,0 +1,28 @@
+{
+  "synthetic_fleet": true,
+  "call_id": "4cp-2025-08-28",
+  "ambient_c": 37.8,
+  "power_kw": 10.0,
+  "kwh": 15.0,
+  "units": [
+    {
+      "sun_exposure": 0.0,
+      "age_years": 5.0,
+      "health": 0.9352164487241107,
+      "enclosure_start_c": 37.8,
+      "enclosure_end_c": 39.08311936010007,
+      "capacity_fraction_lost": 1.4371709855537153e-05,
+      "reserve_touched": false
+    },
+    {
+      "sun_exposure": 1.0,
+      "age_years": 5.0,
+      "health": 0.9352164487241107,
+      "enclosure_start_c": 44.05,
+      "enclosure_end_c": 45.33311936010007,
+      "capacity_fraction_lost": 1.828467111471523e-05,
+      "reserve_touched": false
+    }
+  ],
+  "ratio_sun1_over_sun0": 1.272268317306064
+}

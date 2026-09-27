@@ -1,0 +1,25 @@
+{
+  "synthetic": true,
+  "seed": 7,
+  "feasible_mw": 40.0,
+  "replacement_health": 0.7,
+  "reserve_frac": 0.3,
+  "reserve_violations": {
+    "runway": 0,
+    "even": 0,
+    "most_charge": 0
+  },
+  "early_replacements": {
+    "runway": 0,
+    "even": 0,
+    "most_charge": 0
+  },
+  "saturated_2000_shortfall_kw": {
+    "runway": 5818.62675211254,
+    "even": 5818.62675211254,
+    "most_charge": 5818.62675211254
+  },
+  "over_call_all_policies_fail": false,
+  "ranking_flipped_across_assumption_sets": false,
+  "repeated_2025_labeled": true
+}

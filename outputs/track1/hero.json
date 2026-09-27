@@ -1,0 +1,39 @@
+{
+  "synthetic": true,
+  "fleet_n": 4000,
+  "seed": 7,
+  "policy_for_ratio": "even",
+  "rule_hash": "3cf61faa1eada54684dc99916442935381ce399f4ad7ae425988472970a5f2af",
+  "soc_each_call": 1.0,
+  "assumption_sets": {
+    "nominal": {
+      "wear_per_kwh_miss": 9.914286423336438e-07,
+      "wear_per_kwh_hit": 1.04453870925781e-06,
+      "ratio": 0.9491545249080303,
+      "wear_fraction_on_misses": 0.9192888006690219,
+      "kwh_miss": 2880000.0,
+      "kwh_hit": 240000.0
+    },
+    "low_sensitivity": {
+      "wear_per_kwh_miss": 5.692650790490991e-07,
+      "wear_per_kwh_hit": 5.675157600476616e-07,
+      "ratio": 1.0030824148412911,
+      "wear_fraction_on_misses": 0.9232951717854344,
+      "kwh_miss": 2880000.0,
+      "kwh_hit": 240000.0
+    },
+    "high_sensitivity": {
+      "wear_per_kwh_miss": 1.5705409421535126e-06,
+      "wear_per_kwh_hit": 1.704667277071e-06,
+      "ratio": 0.9213181735101137,
+      "wear_fraction_on_misses": 0.9170524975419969,
+      "kwh_miss": 2880000.0,
+      "kwh_hit": 240000.0
+    }
+  },
+  "total_capacity_fraction_lost": {
+    "runway": 3.400480063876485,
+    "even": 3.4885897124064478,
+    "most_charge": 4.7193927782811995
+  }
+}

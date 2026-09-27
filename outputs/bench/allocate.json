@@ -1,23 +1,23 @@
 {
   "synthetic": true,
   "policy": "runway",
-  "cost": "stub",
+  "cost": "marginal_wear",
   "timer": "time.perf_counter around allocate() only; fleet built outside; no workers",
-  "cpu": "Apple M4",
-  "python": "3.12.12",
+  "cpu": "Apple M2",
+  "python": "3.14.4",
   "sizes": {
     "1000": {
-      "p50_ms": 1.198,
+      "p50_ms": 8.293,
       "repeats": 5,
       "mw_requested": 10.0
     },
     "10000": {
-      "p50_ms": 13.604,
+      "p50_ms": 78.827,
       "repeats": 5,
       "mw_requested": 100.0
     },
     "100000": {
-      "p50_ms": 183.026,
+      "p50_ms": 837.052,
       "repeats": 5,
       "mw_requested": 1000.0
     }

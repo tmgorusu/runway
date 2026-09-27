@@ -7,33 +7,33 @@
   "soc_each_call": 1.0,
   "assumption_sets": {
     "nominal": {
-      "wear_per_kwh_miss": 9.914286423336438e-07,
-      "wear_per_kwh_hit": 1.04453870925781e-06,
-      "ratio": 0.9491545249080303,
-      "wear_fraction_on_misses": 0.9192888006690219,
+      "wear_per_kwh_miss": 1.0255651244320305e-06,
+      "wear_per_kwh_hit": 1.084102213874687e-06,
+      "ratio": 0.9460040864288624,
+      "wear_fraction_on_misses": 0.9190417721794419,
       "kwh_miss": 2880000.0,
       "kwh_hit": 240000.0
     },
     "low_sensitivity": {
-      "wear_per_kwh_miss": 5.692650790490991e-07,
-      "wear_per_kwh_hit": 5.675157600476616e-07,
-      "ratio": 1.0030824148412911,
-      "wear_fraction_on_misses": 0.9232951717854344,
+      "wear_per_kwh_miss": 5.866008098737835e-07,
+      "wear_per_kwh_hit": 5.866340191857734e-07,
+      "ratio": 0.9999433900679064,
+      "wear_fraction_on_misses": 0.9230729032267159,
       "kwh_miss": 2880000.0,
       "kwh_hit": 240000.0
     },
     "high_sensitivity": {
-      "wear_per_kwh_miss": 1.5705409421535126e-06,
-      "wear_per_kwh_hit": 1.704667277071e-06,
-      "ratio": 0.9213181735101137,
-      "wear_fraction_on_misses": 0.9170524975419969,
+      "wear_per_kwh_miss": 1.6276407116608423e-06,
+      "wear_per_kwh_hit": 1.772699179931977e-06,
+      "ratio": 0.9181708493390847,
+      "wear_fraction_on_misses": 0.9167918269587589,
       "kwh_miss": 2880000.0,
       "kwh_hit": 240000.0
     }
   },
   "total_capacity_fraction_lost": {
-    "runway": 3.400480063876485,
-    "even": 3.4885897124064478,
-    "most_charge": 4.7193927782811995
+    "runway": 3.474285067643028,
+    "even": 3.5978624859257566,
+    "most_charge": 4.898647750133086
   }
 }

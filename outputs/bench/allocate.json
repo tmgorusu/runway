@@ -7,17 +7,17 @@
   "python": "3.14.4",
   "sizes": {
     "1000": {
-      "p50_ms": 8.293,
+      "p50_ms": 8.637,
       "repeats": 5,
       "mw_requested": 10.0
     },
     "10000": {
-      "p50_ms": 78.827,
+      "p50_ms": 78.996,
       "repeats": 5,
       "mw_requested": 100.0
     },
     "100000": {
-      "p50_ms": 837.052,
+      "p50_ms": 834.85,
       "repeats": 5,
       "mw_requested": 1000.0
     }

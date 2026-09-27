@@ -1,6 +1,6 @@
 # Runway
 Wear leveling for utility-dispatched home batteries. A utility calls the fleet for a megawatt target. Runway chooses which homes deliver it so a hot, contract-worn battery does not take the same energy as a cool one. Backup reserve stays untouched. A call the feasible fleet cannot cover is reported as a shortfall.
-The fleet in this plan is synthetic. The ERCOT sample is real public data. There is no Base telemetry here.
+The fleet is synthetic. The ERCOT sample is real public data. There is no Base telemetry here: the seed-7 fleet is built from a synthetic stand-in for what Base's fleet telemetry would plausibly report (`data/telemetry/`), and every file says so.
 ## Plan
 | File | What it is |
 | --- | --- |
@@ -27,6 +27,8 @@ uv run pytest                                                # every test blocks
 | `python -m runway.calendar` | `handoff/calls.parquet`, `handoff/hit_flags.json` (needs `CALLING_RULE.md`) |
 | `python -m runway.e2e --offline` | `outputs/m1/dispatch.json`, 32 units on the published 6/19/2025 4CP interval |
 | `python -m runway.demo --seed 7 --fault offline_wave` | `outputs/track2/metrics.json`, `outputs/demo/decision_table.csv`, `web/index.html`, and Wear's artifacts below (rebuilt only when their inputs change) |
+| `python -m runway.telemetry` | `data/telemetry/`: synthetic Base-like registry and daily unit telemetry, April–September 2025, driven by real Austin weather and the 2025 call days |
+| `python -m runway.telemetry_fit` | `outputs/telemetry/fleet_estimates.parquet` (the seed-7 fleet) and `outputs/physics/telemetry_fit.json` (fit scored against the hidden truth) |
 | `python -m runway.wear` | `outputs/track1/hero.json`, `outputs/replay/summary.json` and `detail.json`, `outputs/physics/*.json`, `PHYSICS_LINES.md` |
 | `python -m runway.dispatcher --ladder` | `outputs/track2/ladder.json`, the filmed N |
 | `python -m runway.bench` | `outputs/bench/allocate.json` |

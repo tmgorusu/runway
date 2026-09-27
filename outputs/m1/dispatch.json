@@ -14,131 +14,131 @@
   "setpoints": [
     {
       "unit_id": 0,
-      "power_kw": 12.692729
+      "power_kw": 4.48644
     },
     {
       "unit_id": 1,
-      "power_kw": 13.068634
+      "power_kw": 12.29312
     },
     {
       "unit_id": 2,
-      "power_kw": 10.865581
+      "power_kw": 11.806517
     },
     {
       "unit_id": 3,
-      "power_kw": 9.621464
+      "power_kw": 7.068544
     },
     {
       "unit_id": 4,
-      "power_kw": 9.591199
+      "power_kw": 10.196704
     },
     {
       "unit_id": 5,
-      "power_kw": 13.914628
+      "power_kw": 11.460773
     },
     {
       "unit_id": 6,
-      "power_kw": 1.821732
+      "power_kw": 9.497899
     },
     {
       "unit_id": 7,
-      "power_kw": 13.157726
+      "power_kw": 8.844826
     },
     {
       "unit_id": 8,
-      "power_kw": 12.515925
+      "power_kw": 11.24857
     },
     {
       "unit_id": 9,
-      "power_kw": 9.358696
+      "power_kw": 4.700681
     },
     {
       "unit_id": 10,
-      "power_kw": 8.716685
+      "power_kw": 11.729685
     },
     {
       "unit_id": 11,
-      "power_kw": 7.820221
+      "power_kw": 10.229632
     },
     {
       "unit_id": 12,
-      "power_kw": 7.885191
+      "power_kw": 11.563217
     },
     {
       "unit_id": 13,
-      "power_kw": 9.381127
+      "power_kw": 11.768102
     },
     {
       "unit_id": 14,
-      "power_kw": 11.970892
+      "power_kw": 11.511995
     },
     {
       "unit_id": 15,
-      "power_kw": 10.964473
+      "power_kw": 11.422357
     },
     {
       "unit_id": 16,
-      "power_kw": 12.223059
+      "power_kw": 10.185728
     },
     {
       "unit_id": 17,
-      "power_kw": 10.718389
+      "power_kw": 8.744213
     },
     {
       "unit_id": 18,
-      "power_kw": 11.00307
+      "power_kw": 9.944256
     },
     {
       "unit_id": 19,
-      "power_kw": 12.153799
+      "power_kw": 9.50796
     },
     {
       "unit_id": 20,
-      "power_kw": 9.680172
+      "power_kw": 12.71844
     },
     {
       "unit_id": 21,
-      "power_kw": 7.941512
+      "power_kw": 10.021089
     },
     {
       "unit_id": 22,
-      "power_kw": 11.012039
+      "power_kw": 13.463894
     },
     {
       "unit_id": 23,
-      "power_kw": 6.300469
+      "power_kw": 9.427469
     },
     {
       "unit_id": 24,
-      "power_kw": 3.612437
+      "power_kw": 11.793712
     },
     {
       "unit_id": 25,
-      "power_kw": 11.007077
+      "power_kw": 12.389161
     },
     {
       "unit_id": 26,
-      "power_kw": 8.580267
+      "power_kw": 12.71844
     },
     {
       "unit_id": 27,
-      "power_kw": 12.230272
+      "power_kw": 7.097814
     },
     {
       "unit_id": 28,
-      "power_kw": 10.150653
+      "power_kw": 6.216989
     },
     {
       "unit_id": 29,
-      "power_kw": 10.161174
+      "power_kw": 9.417408
     },
     {
       "unit_id": 30,
-      "power_kw": 9.412159
+      "power_kw": 7.046592
     },
     {
       "unit_id": 31,
-      "power_kw": 10.466547
+      "power_kw": 9.477776
     }
   ],
   "delivered_kw": 320.0,

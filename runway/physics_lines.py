@@ -45,6 +45,13 @@ def lines() -> list[tuple[str, str]]:
                     f"{100 * c['cycle_25c_1000efc']['relative_error']:.1f}% (cycle, 25 °C) with zero fitted parameters. "
                     f"At 45 °C our cycle fade is {blast['cycle_45c_ours_over_blast']:.1f}× BLAST's, by design.",
                     "outputs/physics/blast_overlay.json"))
+    fit = _load("physics/telemetry_fit.json")
+    if fit:
+        out.append((f"The seed-7 fleet is built from synthetic Base-like telemetry (April–May 2025, before the replay): "
+                    f"fitted thermal exposure tracks the hidden truth with correlation {fit['exposure_corr']:.3f} "
+                    f"(mean error {fit['exposure_mae']:.3f}); BMS health readings are within {fit['health_mae']:.3f}. "
+                    f"The raw sun exposure alone correlates only {fit['exposure_corr_with_raw_sun']:.2f}: garage heat and "
+                    "enclosure differences matter as much as sunlight.", "outputs/physics/telemetry_fit.json"))
     if glide:
         runs = glide["cost_assumption"]
         g0 = runs["nominal_glide_k_0"]["runway_minus_even_pct"]

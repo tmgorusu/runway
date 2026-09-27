@@ -7,89 +7,89 @@
   "season": {
     "nominal": {
       "runway": {
-        "total_capacity_fraction_lost": 13.363949130084837,
+        "total_capacity_fraction_lost": 13.43797613261215,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 52,
-        "min_health": 0.8825586893288048
+        "min_health": 0.8754523408785714
       },
       "even": {
-        "total_capacity_fraction_lost": 13.515530602201132,
+        "total_capacity_fraction_lost": 13.622707430851008,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 52,
-        "min_health": 0.8827515310745165
+        "min_health": 0.8757438497891967
       },
       "most_charge": {
-        "total_capacity_fraction_lost": 14.71209356518714,
+        "total_capacity_fraction_lost": 14.85900623074373,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 52,
-        "min_health": 0.8817241578889448
+        "min_health": 0.8759545304451835
       }
     },
     "low_sensitivity": {
       "runway": {
-        "total_capacity_fraction_lost": 10.938486282041172,
+        "total_capacity_fraction_lost": 10.96166611560359,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 52,
-        "min_health": 0.8830492478872419
+        "min_health": 0.8759481683061833
       },
       "even": {
-        "total_capacity_fraction_lost": 11.040502763223559,
+        "total_capacity_fraction_lost": 11.094991920431221,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 52,
-        "min_health": 0.8833026236626863
+        "min_health": 0.876235441794057
       },
       "most_charge": {
-        "total_capacity_fraction_lost": 11.595919532168665,
+        "total_capacity_fraction_lost": 11.66363234642091,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 52,
-        "min_health": 0.8827386550838913
+        "min_health": 0.8767049752103291
       }
     },
     "high_sensitivity": {
       "runway": {
-        "total_capacity_fraction_lost": 16.61326440962297,
+        "total_capacity_fraction_lost": 16.78732274143301,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 52,
-        "min_health": 0.8818730776933852
+        "min_health": 0.874789332665337
       },
       "even": {
-        "total_capacity_fraction_lost": 16.87275733961233,
+        "total_capacity_fraction_lost": 17.05187275311248,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 52,
-        "min_health": 0.8819358586300717
+        "min_health": 0.8750705813458006
       },
       "most_charge": {
-        "total_capacity_fraction_lost": 19.650647165140448,
+        "total_capacity_fraction_lost": 19.93923455089892,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 52,
-        "min_health": 0.8800063900496049
+        "min_health": 0.8749033388459367
       }
     }
   },
@@ -114,31 +114,31 @@
     "label": "repeated year: 2,000 units asked for 40 MW, one call per day at 44.0 C ambient, idle daily mean 34.0 C, 10 years, nominal set",
     "results": {
       "runway": {
-        "total_capacity_fraction_lost": 443.5080670272462,
-        "early_replacements": 255,
+        "total_capacity_fraction_lost": 445.86284650547145,
+        "early_replacements": 236,
         "reserve_violations": 0,
         "shortfall_calls": 122,
-        "max_shortfall_kw": 13898.745284838697,
+        "max_shortfall_kw": 13901.040657152254,
         "solves": 122,
-        "min_health": 0.685319001980562
+        "min_health": 0.6752508415524149
       },
       "even": {
-        "total_capacity_fraction_lost": 443.5080670272462,
-        "early_replacements": 255,
+        "total_capacity_fraction_lost": 445.86284650547145,
+        "early_replacements": 236,
         "reserve_violations": 0,
         "shortfall_calls": 122,
-        "max_shortfall_kw": 13898.745284838697,
+        "max_shortfall_kw": 13901.040657152254,
         "solves": 122,
-        "min_health": 0.685319001980562
+        "min_health": 0.6752508415524149
       },
       "most_charge": {
-        "total_capacity_fraction_lost": 443.5080670272462,
-        "early_replacements": 255,
+        "total_capacity_fraction_lost": 445.86284650547145,
+        "early_replacements": 236,
         "reserve_violations": 0,
         "shortfall_calls": 122,
-        "max_shortfall_kw": 13898.745284838697,
+        "max_shortfall_kw": 13901.040657152254,
         "solves": 122,
-        "min_health": 0.685319001980562
+        "min_health": 0.6752508415524149
       }
     }
   },
@@ -146,31 +146,31 @@
     "label": "earlier pre-registered fixture, kept for the record: 4,000 units at the feasible MW, same schedule",
     "results": {
       "runway": {
-        "total_capacity_fraction_lost": 619.5647969010433,
+        "total_capacity_fraction_lost": 623.3598707645282,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 122,
-        "min_health": 0.7258782801968571
+        "min_health": 0.7208025478169283
       },
       "even": {
-        "total_capacity_fraction_lost": 621.75313270022,
+        "total_capacity_fraction_lost": 625.0445486626154,
         "early_replacements": 0,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 122,
-        "min_health": 0.7452648311977493
+        "min_health": 0.734711117025286
       },
       "most_charge": {
-        "total_capacity_fraction_lost": 676.3561802762765,
-        "early_replacements": 303,
+        "total_capacity_fraction_lost": 680.406287022907,
+        "early_replacements": 273,
         "reserve_violations": 0,
         "shortfall_calls": 0,
         "max_shortfall_kw": 0.0,
         "solves": 122,
-        "min_health": 0.6869272505973478
+        "min_health": 0.6752508415524149
       }
     }
   }

@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "note": "Estimates from synthetic Base-like telemetry scored against the hidden parameters that generated it.",
+  "window": "2025-04-01 to 2025-05-31 (before the replay start)",
+  "exposure_corr": 0.996066950643048,
+  "exposure_mae": 0.022934070630381626,
+  "exposure_corr_with_raw_sun": 0.4989663023598823,
+  "health_mae": 0.003992160856336218,
+  "efc_median_rel_error": 1.1731727759759978e-06,
+  "units_with_outage": 111,
+  "bands": {
+    "exposure_corr_min": 0.95,
+    "exposure_mae_max": 0.05,
+    "health_mae_max": 0.006
+  },
+  "pass": true
+}

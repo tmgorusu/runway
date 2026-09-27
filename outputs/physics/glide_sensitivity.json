@@ -5,19 +5,19 @@
   "cost_assumption": {
     "nominal_glide_k_0": {
       "total_capacity_fraction_lost": {
-        "runway": 3.400480063876484,
-        "even": 3.4885897124064487,
-        "most_charge": 4.7193927782812
+        "runway": 3.4742850676430272,
+        "even": 3.5978624859257566,
+        "most_charge": 4.898647750133084
       },
-      "runway_minus_even_pct": -2.5256523636649173
+      "runway_minus_even_pct": -3.434745456952394
     },
     "sensitivity_glide_k_10": {
       "total_capacity_fraction_lost": {
-        "runway": 3.7838888766470165,
-        "even": 3.4885897124064487,
-        "most_charge": 4.7193927782812
+        "runway": 3.844798861544684,
+        "even": 3.5978624859257566,
+        "most_charge": 4.898647750133084
       },
-      "runway_minus_even_pct": 8.464714643582113
+      "runway_minus_even_pct": 6.86341894902603
     }
   },
   "wear_measured_with": "nominal"

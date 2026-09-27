@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "note": "Synthetic stand-in for Base fleet telemetry. Not Base data. Drivers: real Austin weather and 2025 call days.",
+  "seed": 7,
+  "window": [
+    "2025-04-01",
+    "2025-09-30"
+  ],
+  "files": {
+    "registry.parquet": {
+      "rows": 4000,
+      "sha256": "5adedf665c1c09743d23521014b881018ad4844b093d66019d27a8d3e0a856dc"
+    },
+    "daily.parquet": {
+      "rows": 732000,
+      "sha256": "61db822f5499f7d2fb6aecd05b7d8d4246c8ac42d18270659eea5fa30545ed31"
+    },
+    "truth.parquet": {
+      "rows": 4000,
+      "sha256": "94333d17decb9e7b9da47ac8bb8506c20390a042f04fb172344787602a6add7c"
+    }
+  }
+}

@@ -1,10 +1,10 @@
-$ python -m runway.demo --seed 7 --fault offline_wave   # recorded 2026-09-27T07:19:43Z
+$ python -m runway.demo --seed 7 --fault offline_wave   # recorded 2026-09-27T07:27:11Z
 SYNTHETIC FLEET. ERCOT dates and 4CP intervals are real; no Base telemetry.
 seed=7  N=4000  cost=marginal_wear  fault=offline_wave (15% largest setpoints)
 requested  40.000 MW
 delivered  40.000 MW   (after re-solve, simulated call time)
 shortfall  0.000 MW   (reported, never covered from reserve)
 reserve_violations = 0
-resole_latency_ms  = 91.2   (wall clock)
+resole_latency_ms  = 89.3   (wall clock)
 seq 1 -> 2   decision table: 4000 units moved
 wrote outputs/track2/metrics.json, outputs/demo/decision_table.csv

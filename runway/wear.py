@@ -48,7 +48,7 @@ def ensure() -> bool:
     fresh = STAMP.exists() and read_json(STAMP) == _inputs() and all(
         (OUTPUTS / p).exists() for p in ("track1/hero.json", "replay/summary.json", "physics/blast_overlay.json",
                                          "telemetry/fleet_estimates.parquet", "physics/telemetry_fit.json",
-                                         "austin/events.json")) and (CALLING_RULE.parent / "web" / "austin.html").exists()
+                                         "austin/events.json"))
     if not fresh:
         run()
     else:

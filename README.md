@@ -4,7 +4,7 @@
 
 **Wear-aware dispatch for utility-called home batteries.** When a utility calls a fleet of home batteries for 40 MW, Runway decides which homes deliver it. The same kWh costs a sun-baked battery more of its life than a shaded one, so Runway fills the megawatts where they wear the fleet least. It never draws backup reserve, and when the fleet can't cover a call it reports the shortfall.
 
-![Runway dashboard: seed-7 offline wave on 4,000 synthetic units](docs/img/dashboard.png)
+![Runway dashboard: the Austin anomaly map with targeted feeder zones for the July 30, 2025 4CP call](docs/img/dashboard.png)
 
 > **What is real and what is not.** The ERCOT 2025 system load, day-ahead forecast, and published 4CP intervals are real public data, and so is the Austin weather. The battery fleet is a **synthetic fleet** of Base Core-sized units (20 kW, 39.2 kWh, LFP). Its telemetry is a synthetic stand-in for what a fleet operator would plausibly report. There is no Base Power data here, and nothing claims how Base Power dispatches.
 
@@ -29,17 +29,17 @@ Every number below comes from a file the one command writes.
 - Called every day for ten years (the over-call fixture), every policy loses the same 236 units.
 - The Runway effect rests on the cycle-aging activation energy. With BLAST-Lite's small-cell LFP data, where temperature doesn't affect cycling, the hot/cool difference disappears (ratio 1.000).
 
-## Austin anomaly map
+## The dashboard
 
-![Austin anomaly map: targeted feeder zones for the July 30, 2025 4CP call](docs/img/austin.png)
-
-`web/austin.html` is an interactive map of the Austin Energy territory. It covers the 58 anomaly days between April and September 2025 under a rule fixed before the first run: 52 4CP candidate calls, 10 LZ_AEN day-ahead price spikes, and 2 heat anomalies. For each day it picks which of 30 synthetic feeder zones to call, using three layers:
+`web/index.html` is the whole product in one page, and it works offline. The main view is an interactive map of the Austin Energy territory. It covers the 58 anomaly days between April and September 2025 under a rule fixed before the first run: 52 4CP candidate calls, 10 LZ_AEN day-ahead price spikes, and 2 heat anomalies. For each day it picks which of 30 synthetic feeder zones to call, using three layers:
 
 - **Clearing price (Stackelberg).** The utility posts a flexibility price. Each zone offers every kW whose marginal wear is at or below that price, up to its hosting limit. Marginal wear includes enclosure heat, BMS health, cycles, C-rate, and stale telemetry.
 - **Coalition.** Calling a zone has a fixed activation cost, so a local search drops and adds zones until wear plus activation cost stops falling. The zones left are the targeted subgrid.
 - **Shapley credit.** Each zone's share of the coalition's value, a fair basis for splitting the payment.
 
 Click a zone to simulate a feeder outage, or drag the request, activation-cost, and hosting-limit sliders; the browser re-solves in under 100 ms. A test runs the browser solver in Node and checks it matches the Python solver exactly.
+
+Everything else opens as a popup over the map: the live seed-7 offline wave (KPIs, thermal fleet, water-fill), the 2025 season (hunt, hero ratio, replay, benchmark), physics (heat curve, BLAST-Lite check, telemetry fit), policy comparison, Shapley credit, the event day, and how the game works.
 
 On the July 30 4CP call, the game targets 22 of 30 zones and 3,523 batteries, with no feeder overloaded and no reserve touched. That costs 5.5% more true wear than even spread (10.7% on the stale-telemetry-weighted cost the game optimizes); even spread overloads 7 feeders. The feeder zones and hosting limits are synthetic assumptions, not Austin Energy's feeder map (`outputs/austin/events.json`).
 
@@ -50,7 +50,7 @@ Python 3.12+. The network is needed only to install.
 ```bash
 uv sync                                                        # or: python -m venv .venv && .venv/bin/pip install -r requirements.txt
 uv run python -m runway.demo --seed 7 --fault offline_wave     # the product (~1 min on first run, seconds after)
-open web/index.html                                            # dashboard, works from file:// offline
+open web/index.html                                            # the dashboard, works from file:// offline
 uv run pytest                                                  # 115 tests; every test blocks the network
 ```
 

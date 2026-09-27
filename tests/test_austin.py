@@ -117,9 +117,9 @@ def test_browser_solver_matches_python(solved, tmp_path):
 
 
 def test_page_is_offline_and_labeled():
-    page = ROOT / "web" / "austin.html"
-    if not page.exists():
-        pytest.skip("web/austin.html not built yet")
+    page = ROOT / "web" / "index.html"
+    if not austin.EVENTS_PATH.exists():
+        pytest.skip("outputs/austin/events.json not built yet")
     html = page.read_text()
     assert "synthetic fleet" in html and "RunwayGame" in html and "{{payload}}" not in html
     assert not re.search(r"<(script|link|img)[^>]+(src|href)=\"https?://", html)

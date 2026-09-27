@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Runway · Austin anomaly response · synthetic fleet</title>
+<title>Runway · wear-aware dispatch · synthetic fleet</title>
 <style>
 :root{
   --surface:#f0eeeb;--raised:#fff;--dark:#1e4d2b;--darker:#102a17;--ink:#292826;--muted:#7f7d7a;--line:#d8d7d5;
@@ -19,6 +19,7 @@ body{background:var(--surface);color:var(--ink);font:14px/1.45 var(--sans);-webk
 .mark{font-weight:600;font-size:17px;display:flex;align-items:center;gap:8px}
 .mark i{display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--dark);box-shadow:inset 0 -5px 0 var(--lime)}
 .nav a{white-space:nowrap;color:var(--muted);text-decoration:none}
+.navtag{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nav a.on{color:var(--ink);font-weight:600;border-bottom:2px solid var(--dark);padding-bottom:2px}
 .pill{white-space:nowrap;border-radius:9999px;padding:4px 12px;font-size:12px;font-weight:600}
 .pill.synthetic{background:var(--dark);color:var(--lime);margin-left:auto}
@@ -94,13 +95,31 @@ body.compact #tl{height:40px}
 body.compact #timeline .t span:last-child{display:none}
 body.compact #legend,body.compact #foot{display:none}
 body.compact .pop{left:16px;right:16px;width:auto;top:64px;bottom:auto;max-height:calc(100% - 170px)}
+.pop.wide{width:540px}
+body.compact .pop.wide{width:auto}
+.pop section{border-top:1px solid var(--line);padding-top:10px;margin-top:12px}
+.pop section h4{margin:0 0 2px;font-size:13px;font-weight:600}
+.lkp{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-radius:10px;overflow:hidden;margin:8px 0}
+.lkp div{background:var(--raised);padding:7px 9px}
+.lkp span{display:block;font-size:10px;color:var(--muted)}
+.lkp b{display:block;font-size:17px;font-weight:500;font-variant-numeric:tabular-nums}
+.lkp b.good{color:var(--dark)}
+.hfacts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0}
+.hfact{background:var(--surface);border-radius:10px;padding:8px 10px}
+.hfact b{display:block;font-size:20px;font-weight:500;letter-spacing:-.01em}
+.hfact span{font-size:11px;color:var(--muted)}
+.ratio{font-family:var(--display);font-size:32px;line-height:1;color:var(--dark)}
+.fixture{color:var(--gridoff);font-weight:600}
+.pending{color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:16px;text-align:center;font-size:12px}
+.mini-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted);margin-top:6px}
+.mini-legend .sw{display:inline-block;margin-right:4px;vertical-align:-1px}
+tr.best td:first-child{font-weight:600}
 </style>
 </head>
 <body>
 <header class="nav">
   <span class="mark"><i></i>Runway</span>
-  <a href="index.html">Live dispatch</a>
-  <a class="on" href="austin.html">Austin anomalies</a>
+  <span class="navtag">Wear-aware dispatch · Austin Energy territory · 2025</span>
   <span class="pill synthetic">synthetic fleet</span>
   <span class="pill real">Austin Energy prices &amp; weather: real</span>
 </header>
@@ -129,6 +148,9 @@ body.compact .pop{left:16px;right:16px;width:auto;top:64px;bottom:auto;max-heigh
       <button class="tab" data-pop="p-compare">Compare</button>
       <button class="tab" data-pop="p-shap">Shapley</button>
       <button class="tab" data-pop="p-day">Event day</button>
+      <button class="tab" data-pop="p-live">Live dispatch</button>
+      <button class="tab" data-pop="p-season">Season</button>
+      <button class="tab" data-pop="p-physics">Physics</button>
       <button class="tab" data-pop="p-how">How it works</button>
     </div>
   </div>
@@ -161,6 +183,54 @@ body.compact .pop{left:16px;right:16px;width:auto;top:64px;bottom:auto;max-heigh
     <svg id="day" viewBox="0 0 360 160" style="width:100%;height:160px"></svg>
   </div>
 
+
+  <div class="float pop wide" id="p-live">
+    <h3>Live dispatch: seed-7 offline wave <button data-close>×</button></h3>
+    <p>{{n_units}} synthetic units, cost {{cost}}. The units holding the largest setpoints go offline mid-call; the dispatcher detects the missed heartbeats and re-solves on the survivors. Call progress uses simulated time; re-solve latency uses the wall clock.</p>
+    <div class="lkp">
+      <div><span>Requested MW</span><b id="mw-req">{{mw_requested}}</b></div>
+      <div><span>Delivered MW after re-solve</span><b id="mw-del" class="good">{{mw_delivered}}</b></div>
+      <div><span>Shortfall MW</span><b id="short">{{shortfall_mw}}</b></div>
+      <div><span>Reserve violations</span><b id="rv" class="good">{{reserve_violations}}</b></div>
+      <div><span>Re-solve latency</span><b id="lat">{{latency_ms}} ms</b></div>
+      <div><span>Setpoint sequence</span><b>{{seq}}</b></div>
+    </div>
+    <section id="view-thermal">
+      <h4>Thermal fleet</h4>
+      <p>Each square is one unit, colored by fitted thermal exposure; a dot means it was dispatched after the re-solve.</p>
+      <canvas id="fleet" height="200" style="width:100%;height:200px;display:block"></canvas>
+      <div class="mini-legend"><span><i class="sw" style="background:var(--sky)"></i>cool</span><span><i class="sw" style="background:var(--gold)"></i>warm</span><span><i class="sw" style="background:var(--energy)"></i>sun-baked</span><span><i class="sw" style="background:var(--line)"></i>offline</span></div>
+    </section>
+    <section id="view-waterfill">
+      <h4>Water-fill</h4>
+      <p>Units sorted by marginal wear, cheapest left. Power fills from the left until the call is met; the dashed line is the threshold λ.</p>
+      <svg id="wf" viewBox="0 0 600 220" preserveAspectRatio="none" style="width:100%;height:200px;display:block"></svg>
+    </section>
+  </div>
+
+  <div class="float pop wide" id="p-season">
+    <h3>Season 2025 <button data-close>×</button></h3>
+    <p>The pre-registered 0.97 day-ahead hunt on real ERCOT 2025 data, and a summer replay of three policies at the feasible megawatt level.</p>
+    <div class="hfacts" id="hunt"></div>
+    <section id="view-replay">
+      <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
+        <div><div class="note" style="margin:0">Wear per kWh, misses ÷ hits (even spread, nominal)</div><b id="hero-ratio" class="ratio">{{hero_ratio}}</b></div>
+        <div class="note">Source: <span id="hero-src">{{hero_label}}</span></div>
+      </div>
+      <div id="replay"></div>
+      <h4 style="margin-top:12px">Allocator benchmark</h4>
+      <div id="bench"></div>
+    </section>
+  </div>
+
+  <div class="float pop wide" id="p-physics">
+    <h3>Physics <button data-close>×</button></h3>
+    <p>Capacity lost per kWh as the enclosure heats up, from Wear's aging model, and how that model compares with NREL BLAST-Lite.</p>
+    <section id="view-heat">
+      <div id="heat"></div>
+      <div id="physics-notes" class="note"></div>
+    </section>
+  </div>
   <div class="float pop how" id="p-how">
     <h3>How the game works <button data-close>×</button></h3>
     <ol>
@@ -194,11 +264,13 @@ body.compact .pop{left:16px;right:16px;width:auto;top:64px;bottom:auto;max-heigh
 <script>
 (function(){
 const D = JSON.parse(document.getElementById('payload').textContent);
+const A = D.austin;
 const G = window.RunwayGame;
 const $ = id => document.getElementById(id);
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const fmt = (x, d=2) => (x===null||x===undefined||!isFinite(x)) ? '—' : Number(x).toFixed(d);
-const events = D.events;
+if(!A){ document.getElementById('stage').insertAdjacentHTML('beforeend', '<div class="float" style="top:40%;left:50%;transform:translate(-50%,-50%);padding:24px">Austin anomaly map not built yet: run <code>python -m runway.demo</code></div>'); }
+const events = A ? A.events : [];
 const state = { i: Math.max(0, events.findIndex(e => e.types.includes('price_spike') && e.types.includes('4cp_candidate'))), out: new Set(), mw: null, f: 1, h: 1, res: null, hover: null };
 
 function mix(a, b, t){ const p=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)); const A=p(a),B=p(b); return `rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`; }
@@ -210,15 +282,15 @@ document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
   const id = b.dataset.pop, open = $(id).classList.contains('show');
   document.querySelectorAll('.pop').forEach(p => p.classList.remove('show'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  if(!open){ $(id).classList.add('show'); b.classList.add('on'); }
+  if(!open){ $(id).classList.add('show'); b.classList.add('on'); drawPopup(id); }
 });
 document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => {
   b.closest('.pop').classList.remove('show'); document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
 });
 
 // ---- map ----
-const lat0=Math.min(...D.zones.map(z=>z.cell[0])), lat1=Math.max(...D.zones.map(z=>z.cell[1]));
-const lon0=Math.min(...D.zones.map(z=>z.cell[2])), lon1=Math.max(...D.zones.map(z=>z.cell[3]));
+const lat0=Math.min(...A.zones.map(z=>z.cell[0])), lat1=Math.max(...A.zones.map(z=>z.cell[1]));
+const lon0=Math.min(...A.zones.map(z=>z.cell[2])), lon1=Math.max(...A.zones.map(z=>z.cell[3]));
 const KX=Math.cos(30.27*Math.PI/180);
 let zoneRects=[];
 function drawMap(){
@@ -232,7 +304,7 @@ function drawMap(){
   const kw=new Map(), maxKw=Math.max(1,...res.dispatch_kw);
   res.members.forEach((id,j)=>kw.set(id,res.dispatch_kw[j]));
   const shap=new Map(); const tot=res.shapley.reduce((a,b)=>a+b,0)||1; res.members.forEach((id,j)=>shap.set(id,res.shapley[j]/tot));
-  zoneRects=D.zones.map((z,k)=>{ const [a,b]=proj(z.cell[1],z.cell[2]), [c2,d]=proj(z.cell[0],z.cell[3]); return {z,k,x:a,y:b,w:c2-a,h:d-b}; });
+  zoneRects=A.zones.map((z,k)=>{ const [a,b]=proj(z.cell[1],z.cell[2]), [c2,d]=proj(z.cell[0],z.cell[3]); return {z,k,x:a,y:b,w:c2-a,h:d-b}; });
   for(const r of zoneRects){
     const out=state.out.has(r.z.id), t=kw.has(r.z.id)?kw.get(r.z.id)/maxKw:null, hov=state.hover===r.k;
     roundRect(g,r.x+2,r.y+2,r.w-4,r.h-4,10);
@@ -241,14 +313,14 @@ function drawMap(){
     g.lineWidth = hov ? 3 : (t!==null ? 2 : 1); g.strokeStyle = hov ? css('--ink') : (t!==null ? css('--lime') : '#d3d1cc'); g.stroke();
   }
   const stale=new Set(e.stale_units);
-  D.units.forEach(([la,lo,ex],u)=>{ const [x,y]=proj(la,lo);
+  A.units.forEach(([la,lo,ex],u)=>{ const [x,y]=proj(la,lo);
     g.fillStyle = stale.has(u) ? '#292826' : (ex<0.5 ? mix(css('--sky'),'#f9d77d',ex*2) : mix('#f9d77d',css('--energy'),(ex-0.5)*2));
     g.globalAlpha = stale.has(u) ? 1 : 0.42; g.beginPath(); g.arc(x,y,stale.has(u)?2.6:1.15,0,7); g.fill(); });
   g.globalAlpha=1;
   g.font = document.body.classList.contains('compact') ? '600 10px sans-serif' : '600 12px sans-serif';
   const placed=[];
   const overlaps=(a)=>placed.some(b=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y);
-  for(const L of D.landmarks){ const [x,y]=proj(L.lat,L.lon);
+  for(const L of A.landmarks){ const [x,y]=proj(L.lat,L.lon);
     g.fillStyle='#ffffff'; g.beginPath(); g.arc(x,y,5,0,7); g.fill(); g.strokeStyle=css('--ink'); g.lineWidth=2; g.stroke(); g.lineWidth=1;
     if(document.body.classList.contains('compact') && L.name !== 'Downtown') continue;
     const tw=g.measureText(L.name).width+10, lh=document.body.classList.contains('compact')?16:20;
@@ -291,7 +363,7 @@ $('map').onmousemove = ev => {
 $('map').onmouseleave = () => { $('tip').style.display='none'; if(state.hover!==null){ state.hover=null; drawMap(); } };
 
 // ---- timeline ----
-const DAY0=new Date(D.rule.window[0]+'T00:00:00Z'), DAY1=new Date(D.rule.window[1]+'T00:00:00Z'), NDAYS=Math.round((DAY1-DAY0)/864e5)+1;
+const DAY0=new Date(A.rule.window[0]+'T00:00:00Z'), DAY1=new Date(A.rule.window[1]+'T00:00:00Z'), NDAYS=Math.round((DAY1-DAY0)/864e5)+1;
 function drawTimeline(){
   const {g,w,h}=setupCanvas($('tl')), pad=4, bw=(w-2*pad)/NDAYS;
   g.clearRect(0,0,w,h);
@@ -339,18 +411,75 @@ function drawShapley(res){
     (rows.length>10?`<text x="0" y="${H-1}" font-size="10" fill="${css('--muted')}">+${rows.length-10} more zones</text>`:'');
 }
 
+
+// ---- live dispatch, season, physics (pipeline JSON) ----
+function pending(msg){ return `<div class="pending">${msg}</div>`; }
+function drawPopup(id){ if(id==='p-live'){ drawThermal(); drawWaterfill(); } if(id==='p-season') drawSeason(); if(id==='p-physics') drawPhysics(); }
+function drawThermal(){
+  const c=$('fleet'), run=D.run; if(!run){ c.outerHTML=pending('outputs/demo/run.json not written yet: run the demo'); return; }
+  const dpr=window.devicePixelRatio||1, W=c.clientWidth, H=200; c.width=W*dpr; c.height=H*dpr; const g=c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
+  const n=run.units.length, cols=Math.ceil(Math.sqrt(n*W/H)), rows=Math.ceil(n/cols), s=Math.min(W/cols,H/rows), off=new Set(run.faulted), after=new Map(run.setpoints_after.map(([u,p])=>[u,p]));
+  run.units.forEach(([id,sun],i)=>{ const x=(i%cols)*s, y=Math.floor(i/cols)*s;
+    g.fillStyle = off.has(id) ? css('--line') : (sun<0.5 ? mix(css('--sky'),'#f9d77d',sun*2) : mix('#f9d77d',css('--energy'),(sun-0.5)*2));
+    g.fillRect(x,y,Math.max(1,s-0.6),Math.max(1,s-0.6));
+    if(!off.has(id)&&(after.get(id)||0)>0&&s>=4){ g.fillStyle='rgba(41,40,38,.7)'; g.fillRect(x+s/2-1,y+s/2-1,2,2); } });
+}
+function drawWaterfill(){
+  const svg=$('wf'), run=D.run; if(!run){ svg.outerHTML=pending('run.json missing'); return; }
+  const off=new Set(run.faulted), after=new Map(run.setpoints_after.map(([u,p])=>[u,p]));
+  const pts=run.units.map(([id,sun,h,cost])=>({id,cost,p:after.get(id)||0,off:off.has(id)})).sort((a,b)=>a.cost-b.cost||a.id-b.id);
+  const W=600,H=220,pad=26,n=pts.length,bw=(W-pad)/n,pmax=20; let out='';
+  for(const k of [0,10,20]){ const y=H-pad-k/pmax*(H-2*pad); out+=`<line x1="${pad}" y1="${y}" x2="${W}" y2="${y}" stroke="${css('--line')}"/><text x="0" y="${y+4}" font-size="10" fill="${css('--muted')}">${k} kW</text>`; }
+  const step=Math.max(1,Math.floor(n/600));
+  for(let i=0;i<n;i+=step){ const q=pts[i], h=(q.off?pmax:q.p)/pmax*(H-2*pad); out+=`<rect x="${pad+i*bw}" y="${H-pad-h}" width="${Math.max(bw*step,0.6)}" height="${h}" fill="${q.off?css('--off'):css('--dark')}" opacity="${q.off?0.35:1}"/>`; }
+  const used=pts.filter(q=>!q.off&&q.p>0), lam=used.length?Math.max(...used.map(q=>q.cost)):null;
+  if(lam!==null){ const idx=pts.findIndex(q=>q.cost>lam), x=pad+(idx<0?n:idx)*bw; out+=`<line x1="${x}" y1="${pad-10}" x2="${x}" y2="${H-pad}" stroke="${css('--energy')}" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${Math.min(x+6,W-150)}" y="${pad}" font-size="11" fill="${css('--energy')}">λ = ${lam.toExponential(2)}</text>`; }
+  svg.innerHTML=out;
+}
+function drawSeason(){
+  const H=D.hit_flags, hero=D.hero&&D.hero.assumption_sets&&D.hero.assumption_sets.nominal, f=[];
+  if(H) f.push([`${H.n_hits} of ${H.published_4cp.length}`,`published 4CP intervals caught by ${H.n_calls} pre-registered calls`]);
+  if(hero) f.push([`${fmt(100*hero.wear_fraction_on_misses,1)}%`,'of summer call wear lands on calls that missed every 4CP interval']);
+  if(D.pair) f.push([`${fmt(D.pair.ratio_sun1_over_sun0,2)}×`,`capacity lost by a sun-baked unit vs a shaded one for the same ${fmt(D.pair.kwh,0)} kWh`]);
+  if(D.detail){ const s=D.detail.season.nominal; f.push([`${fmt(100*(1-s.runway.total_capacity_fraction_lost/s.even.total_capacity_fraction_lost),1)}%`,'less fleet capacity lost over the summer than even spread']); }
+  $('hunt').innerHTML = f.length ? f.map(([b,t])=>`<div class="hfact"><b>${b}</b><span>${t}</span></div>`).join('') : pending('Wear artifacts not written yet');
+  if(D.hero_is_fixture) $('hero-src').className='fixture';
+  const S=D.summary, det=D.detail;
+  if(!S){ $('replay').innerHTML=pending('outputs/replay/summary.json not written yet'); }
+  else { const pol=['runway','even','most_charge'], name={runway:'Runway',even:'Even spread',most_charge:'Most charge first'};
+    const tot=det?Object.fromEntries(pol.map(p=>[p,det.season.nominal[p].total_capacity_fraction_lost])):null, best=tot?pol.reduce((a,b)=>tot[a]<=tot[b]?a:b):null;
+    const oc=det&&det.over_call_fixture?det.over_call_fixture.results:{};
+    $('replay').innerHTML=`<table style="margin-top:8px"><tr><th>policy</th>${tot?'<th>capacity lost</th>':''}<th>early repl.</th><th>reserve viol.</th><th>2,000-unit shortfall</th><th>over-call repl.</th></tr>`+
+      pol.map(p=>`<tr class="${p===best?'best':''}"><td>${name[p]}</td>${tot?`<td>${fmt(tot[p],2)}</td>`:''}<td>${S.early_replacements[p]}</td><td>${S.reserve_violations[p]}</td><td>${fmt(S.saturated_2000_shortfall_kw[p]/1000,2)} MW</td><td>${oc[p]?oc[p].early_replacements:'—'}</td></tr>`).join('')+
+      `</table><div class="note">Feasible level ${fmt(S.feasible_mw,1)} MW. Over-call fixture fails all three policies: ${S.over_call_all_policies_fail}. Ranking flipped across assumption sets: ${S.ranking_flipped_across_assumption_sets}.</div>`; }
+  $('bench').innerHTML = D.bench ? `<table><tr><th>units</th><th>p50</th></tr>`+Object.entries(D.bench.sizes).map(([n,r])=>`<tr><td>${(+n).toLocaleString()}</td><td>${r.p50_ms.toFixed(1)} ms</td></tr>`).join('')+`</table><div class="note">${D.bench.cpu} · cost ${D.bench.cost} · allocate() only</div>` : pending('outputs/bench/allocate.json not written yet');
+}
+function drawPhysics(){
+  const el=$('heat');
+  if(!D.heat){ el.innerHTML=pending('Waiting on Wear: runway.aging.age is not importable yet.'); return; }
+  const P=D.heat.points, W=500, H=220, pad=36, xs=P.map(p=>p[0]), ys=P.map(p=>p[1]), x0=Math.min(...xs), x1=Math.max(...xs), y1=Math.max(...ys)||1;
+  const X=t=>pad+(t-x0)/(x1-x0)*(W-pad-10), Y=v=>H-pad-v/y1*(H-2*pad);
+  const path=P.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(''), area=path+`L${X(x1).toFixed(1)},${H-pad}L${X(x0).toFixed(1)},${H-pad}Z`;
+  let ticks=''; for(let t=Math.ceil(x0/10)*10;t<=x1;t+=10) ticks+=`<line x1="${X(t)}" y1="${pad-8}" x2="${X(t)}" y2="${H-pad}" stroke="${css('--line')}" stroke-width="0.6"/><text x="${X(t)-10}" y="${H-pad+16}" font-size="11" fill="${css('--muted')}">${t} °C</text>`;
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:220px">${ticks}<path d="${area}" fill="${css('--energy-soft')}"/><path d="${path}" fill="none" stroke="${css('--energy')}" stroke-width="2.5"/><line x1="${pad}" y1="${H-pad}" x2="${W}" y2="${H-pad}" stroke="${css('--muted')}"/></svg>`;
+  const b=D.blast, t=D.telemetry_fit, notes=[`${D.heat.power_kw} kW for ${D.heat.duration_min} min: ${fmt(100*(P[P.length-1][1]/P[0][1]-1),0)}% more capacity lost per kWh at ${x1} °C than at ${x0} °C.`];
+  if(b&&b.status==='ok') notes.push(`Matches BLAST-Lite within ${fmt(100*b.checks.calendar_25c_365d.relative_error,1)}% (calendar, 25 °C) and ${fmt(100*b.checks.cycle_25c_1000efc.relative_error,1)}% (cycle, 25 °C) with zero fitted parameters; at 45 °C our cycle fade is ${fmt(b.cycle_45c_ours_over_blast,1)}× BLAST's, by design.`);
+  if(t) notes.push(`Thermal exposure fitted from synthetic telemetry tracks the hidden truth with correlation ${fmt(t.exposure_corr,3)}.`);
+  $('physics-notes').innerHTML=notes.join('<br>');
+}
+
 function update(){
   const e=events[state.i], zones=e.zones, R=state.mw*1000, F=e.activation_cost*state.f;
   $('mw-v').textContent=`${state.mw} MW`; $('f-v').textContent=`${fmt(state.f,2)}× default`; $('h-v').textContent=`${fmt(state.h,2)}×`;
   const res=G.solve(zones,{R,F,hostMul:state.h,out:[...state.out],M:128,seed:7}); state.res=res;
   const allowed=zones.map((_,i)=>i).filter(i=>!state.out.has(zones[i].id));
   const free=G.equilibrium(zones,allowed,R,1e9);
-  const nUnits=allowed.reduce((s,i)=>s+D.zones[i].n_units,0), pEven=R/Math.max(1,nUnits);
+  const nUnits=allowed.reduce((s,i)=>s+A.zones[i].n_units,0), pEven=R/Math.max(1,nUnits);
   let evenWear=0,evenViol=0,evenKw=0;
   for(const i of allowed){ const z=zones[i],k=Math.min(19.999,pEven),a=Math.floor(k),t=k-a; evenWear+=z.even[a]+(z.even[a+1]-z.even[a])*t;
-    const kw=Math.min(pEven*D.zones[i].n_units,z.kw[z.kw.length-1]); evenKw+=kw; if(kw>z.host_kw*state.h+1e-6) evenViol++; }
+    const kw=Math.min(pEven*A.zones[i].n_units,z.kw[z.kw.length-1]); evenKw+=kw; if(kw>z.host_kw*state.h+1e-6) evenViol++; }
   const freeViol=allowed.filter((i,j)=>free.dispatch[j]>zones[i].host_kw*state.h+1e-6).length;
-  const units=res.members.reduce((s,id)=>s+D.zones.find(z=>z.id===id).n_units,0);
+  const units=res.members.reduce((s,id)=>s+A.zones.find(z=>z.id===id).n_units,0);
   $('r-big').textContent = document.body.classList.contains('compact') ? `${res.members.length} of ${allowed.length} zones · ${res.wear>=evenWear?'+':''}${fmt(100*(res.wear/evenWear-1),1)}% wear vs even` : `${res.members.length} of ${allowed.length} zones`;
   $('r-sub').textContent=`${units.toLocaleString()} batteries carry ${fmt((R-res.shortfall_kw)/1000,1)} MW, every feeder within its hosting limit, no reserve touched.`;
   $('k-lam').textContent=res.lam===null?'—':res.lam.toExponential(2);
@@ -374,9 +503,9 @@ $('prev').onclick=()=>pick(state.i-1); $('next').onclick=()=>pick(state.i+1);
 document.addEventListener('keydown',ev=>{ if(ev.key==='ArrowRight') pick(state.i+1); if(ev.key==='ArrowLeft') pick(state.i-1); if(ev.key==='Escape') document.querySelectorAll('[data-close]').forEach(b=>b.closest('.pop').classList.contains('show')&&b.click()); });
 function layout(){ document.body.classList.toggle('compact', innerWidth < 1100 || innerHeight < 720); }
 $('ev-title').onclick=()=>{ if(document.body.classList.contains('compact')) $('event').classList.toggle('open'); };
-window.addEventListener('resize',()=>{ layout(); update(); });
+window.addEventListener('resize',()=>{ layout(); if(A) update(); const open=document.querySelector('.pop.show'); if(open) drawPopup(open.id); });
 layout();
-pick(state.i);
+if(A) pick(state.i);
 })();
 </script>
 </body>

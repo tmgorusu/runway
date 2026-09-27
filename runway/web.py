@@ -5,7 +5,7 @@ Every number on it comes from a file under outputs/ (or, before Wear's hero land
 web/fixture/hero.json, labeled FIXTURE on the page). Headline numbers are rendered
 into the HTML here; the charts are drawn by inline JS from the same embedded data.
 
-Four views: thermal fleet, water-fill, heat curve, replay.
+One dashboard: the Austin anomaly map is the main view; live dispatch (thermal fleet, water-fill), physics (heat curve), and the season replay open as popups over it.
 """
 
 from __future__ import annotations
@@ -32,6 +32,7 @@ SOURCES = {
     "pair": OUT / "physics" / "reference_pair.json",
     "telemetry_fit": OUT / "physics" / "telemetry_fit.json",
     "hit_flags": ROOT / "handoff" / "hit_flags.json",
+    "austin": OUT / "austin" / "events.json",
 }
 HERO = OUT / "track1" / "hero.json"
 
@@ -104,7 +105,8 @@ def build() -> Path:
     return out
 
 
-TEMPLATE = (Path(__file__).resolve().parent / "web_template.html").read_text()
+TEMPLATE = (Path(__file__).resolve().parent / "dashboard_template.html").read_text().replace(
+    "/*GAME_JS*/", (Path(__file__).resolve().parent / "austin_game.js").read_text())
 
 
 def main(argv=None) -> int:

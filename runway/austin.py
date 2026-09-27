@@ -1,6 +1,6 @@
 """Austin anomaly response: game-theoretic subgrid targeting with wear leveling.
 
-`python -m runway.austin` writes outputs/austin/events.json and web/austin.html.
+`python -m runway.austin` writes outputs/austin/events.json and rebuilds the dashboard (web/index.html).
 
 Anomaly rule (fixed before the first run; Austin Energy territory, 2025-04-01 to 2025-09-30,
 the window the synthetic telemetry covers). A local day is an anomaly when any of these hold:
@@ -38,12 +38,9 @@ from runway.allocate import GRID_POINTS, water_fill
 from runway.contracts import CAPACITY_KWH, Call, feasible_kw
 from runway.fleet import make_fleet
 from runway.marginal import call_wear, marginal_grid, unit_arrays, weights
-from runway.paths import OUTPUTS, ROOT, WEB
+from runway.paths import OUTPUTS, ROOT
 
 EVENTS_PATH = OUTPUTS / "austin" / "events.json"
-PAGE = WEB / "austin.html"
-TEMPLATE = ROOT / "runway" / "austin_template.html"
-GAME_JS = ROOT / "runway" / "austin_game.js"
 TZ = "America/Chicago"
 WINDOW = (pd.Timestamp("2025-04-01").date(), pd.Timestamp("2025-09-30").date())
 MW_BY_TYPE = {"4cp_candidate": 40.0, "price_spike": 30.0, "heat": 20.0}
@@ -463,15 +460,9 @@ def build() -> dict:
     }
     EVENTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     EVENTS_PATH.write_text(json.dumps(out, separators=(",", ":")) + "\n")
-    render(out)
+    from runway import web
+    web.build()
     return out
-
-
-def render(data: dict) -> None:
-    page = TEMPLATE.read_text()
-    page = page.replace("/*GAME_JS*/", GAME_JS.read_text())
-    page = page.replace("{{payload}}", json.dumps(data, separators=(",", ":")).replace("</", "<\\/"))
-    PAGE.write_text(page)
 
 
 def main(argv=None) -> int:
@@ -483,7 +474,7 @@ def main(argv=None) -> int:
         r = e["result"]
         print(f"  {e['day']} {'+'.join(e['types']):28s} {e['mw']:.0f} MW -> {len(r['members'])} zones, λ*={r['lam']:.3g}, "
               f"wear game {e['units']['game']['true_wear']:.4f} vs even {e['units']['even']['true_wear']:.4f}")
-    print(f"wrote {EVENTS_PATH.relative_to(ROOT)} and {PAGE.relative_to(ROOT)}")
+    print(f"wrote {EVENTS_PATH.relative_to(ROOT)} and web/index.html")
     return 0
 
 

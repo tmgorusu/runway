@@ -7,7 +7,8 @@ from runway.allocate import GRID_POINTS, allocate, water_fill
 from runway.contracts import TOL_KW, check_setpoint, energy_above_reserve_kwh, feasible_kw
 from runway.fleet import make_fleet
 
-FEASIBLE_32 = 32 * 27.44 / 1.5  # kW a full 32-unit fleet can hold for 90 min
+# kW the 32-unit seed-7 fleet can hold for 90 min at SOC 1.0, with health from Wear.initial_health when it imports
+FEASIBLE_32 = sum(feasible_kw(u, 1.5) for u in make_fleet(32))
 
 
 def _check(call, units, sps, shortfall):
@@ -63,12 +64,21 @@ def test_deterministic(make_call):
 
 
 def test_cheaper_units_fill_first(make_call):
+    """Water-fill property for whichever cost is active: every grid point a unit reached costs no more
+    than the first grid point of any unit left idle."""
+    from runway.allocate import cost_matrix, feasible_caps
+
     units = make_fleet(32)
-    sps, _ = allocate(make_call(0.1), units, "runway")
-    sun = np.array([u.sun_exposure + max(0, 1 - u.health) for u in units])
+    call = make_call(0.1)
+    sps, _ = allocate(call, units, "runway")
+    caps = feasible_caps(units, call.hours)
+    grid = caps[:, None] * np.linspace(0.0, 1.0, GRID_POINTS)[None, :]
+    costs = cost_matrix(call, units, grid, "nominal")
     p = np.array([s.power_kw for s in sps])
-    # Anything used is no more expensive than anything left idle.
-    assert sun[p > 0].max() <= sun[p == 0].min() + 1e-12
+    reached = [costs[i, grid[i] <= p[i] + 1e-9].max() for i in range(len(units)) if p[i] > 0]
+    idle_first = [costs[i, 1] for i in range(len(units)) if p[i] == 0]
+    assert reached and idle_first
+    assert max(reached) <= min(idle_first) + 1e-12
 
 
 def test_water_fill_monotone_cost():

@@ -102,8 +102,9 @@ def run(seed: int = 7, fault: str = "offline_wave", n: int | None = None) -> dic
         "solve_ms": r["solve_ms"],
         "units": unit_rows(r),
     }) + "\n")
-    from runway import web
+    from runway import wear, web
 
+    wear.ensure()  # hero.json, summary.json, blast_overlay.json, PHYSICS_LINES.md (cached on inputs)
     web.build()
     return {"metrics": m, "rows": rows, "raw": r}
 

@@ -23,8 +23,10 @@ GRID_POINTS = 21
 
 try:  # Wear owns the scalar.
     from runway.marginal import marginal_wear as _marginal_wear
+    from runway.marginal import marginal_grid as _marginal_grid
+    from runway.marginal import unit_arrays as _unit_arrays
 except ImportError:  # pragma: no cover - depends on Wear's progress
-    _marginal_wear = None
+    _marginal_wear = _marginal_grid = _unit_arrays = None
 
 
 def cost_name() -> str:
@@ -40,6 +42,8 @@ def cost_matrix(call: Call, units: list[UnitState], grid: np.ndarray, assumption
     if _marginal_wear is None:
         _stub.announce()
         return _stub.stub_cost_matrix(units, call, grid, dt_s, assumption)
+    if _marginal_grid is not None:  # Wear's vectorized marginal_wear; tests pin it to the scalar within 1e-9
+        return _marginal_grid(_unit_arrays(units, assumption), call, grid, dt_s, assumption)
     out = np.empty_like(grid)
     for i, u in enumerate(units):
         for j in range(grid.shape[1]):

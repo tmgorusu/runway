@@ -1,0 +1,146 @@
+{
+  "synthetic": true,
+  "seed": 7,
+  "n_units": 32,
+  "policy": "runway",
+  "cost": "stub",
+  "call": {
+    "call_id": "published-4cp-2025-06-19",
+    "start": "2025-06-19T21:15:00+00:00",
+    "duration_min": 90,
+    "mw_requested": 0.32,
+    "ambient_c": 33.067
+  },
+  "setpoints": [
+    {
+      "unit_id": 0,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 1,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 2,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 3,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 4,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 5,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 6,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 7,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 8,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 9,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 10,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 11,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 12,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 13,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 14,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 15,
+      "power_kw": 9.013333
+    },
+    {
+      "unit_id": 16,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 17,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 18,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 19,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 20,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 21,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 22,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 23,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 24,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 25,
+      "power_kw": 18.293333
+    },
+    {
+      "unit_id": 26,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 27,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 28,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 29,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 30,
+      "power_kw": 0.0
+    },
+    {
+      "unit_id": 31,
+      "power_kw": 18.293333
+    }
+  ],
+  "delivered_kw": 320.0,
+  "shortfall_kw": 0.0
+}
